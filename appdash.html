@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="">
+<meta name="auteur" content="">
+<link rel="icon" href="imagr/planet-earth.png">
+<title>Dash</title>
+<!-- Bootstrap core CSS -->
+<link href="assets/css/bootstrap.min.css" rel="stylesheet">
+<!-- Fonts -->
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Righteous%7CMerriweather:300,300i,400,400i,700,700i" rel="stylesheet">
+<!-- Custom styles for this template -->
+<link href="assets/css/mediumish.css" rel="stylesheet">
+</head>
+<body>
+	<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.5.0/themes/prism.min.css"
+    />
+    </head>
+    
+    
+    <body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/prism.min.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/components/prism-python.min.js"></script>
+	
+		
+	</body>
+<!-- Begin Nav
+================================================== -->
+<nav class="navbar navbar-toggleable-md navbar-light bg-white fixed-top mediumnavigation">
+<button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+<span class="navbar-toggler-icon"></span>
+</button>
+<div class="container">
+	<!-- Begin Logo -->
+	<a class="navbar-brand" href="index.html">
+	
+	</a>
+	<!-- End Logo -->
+	<div class="collapse navbar-collapse" id="navbarsExampleDefault">
+		<!-- Begin Menu -->
+		<a class="navbar-brand" href="index.html">
+            <img src="imagr/home.png" alt="logo">
+            </a>
+		<ul class="navbar-nav ml-auto">
+			<li class="nav-item active">
+			<a class="nav-link" href="index.html">Accueil <span class="sr-only">(current)</span></a>
+			</li>
+			
+		</ul>
+		<!-- End Menu -->
+		<!-- Begin Search -->
+		<form class="form-inline my-2 my-lg-0">
+			<input class="form-control mr-sm-2" type="text" placeholder="Search">
+			<span class="search-icon"><svg class="svgIcon-use" width="25" height="25" viewbox="0 0 25 25"><path d="M20.067 18.933l-4.157-4.157a6 6 0 1 0-.884.884l4.157 4.157a.624.624 0 1 0 .884-.884zM6.5 11c0-2.62 2.13-4.75 4.75-4.75S16 8.38 16 11s-2.13 4.75-4.75 4.75S6.5 13.62 6.5 11z"></path></svg></span>
+		</form>
+		<!-- End Search -->
+	</div>
+</div>
+</nav>
+<!-- End Nav
+================================================== -->
+
+<!-- Begin Article
+================================================== -->
+<div class="container">
+	<div class="row">
+
+		<!-- Begin Fixed Left Share -->
+		<div class="col-md-2 col-xs-12">
+			<div class="share">
+				
+			</div>
+		</div>
+		<!-- End Fixed Left Share -->
+
+		<!-- Begin Post -->
+		<div class="col-md-8 col-md-offset-2 col-xs-12">
+			<div class="mainheading">
+
+				<!-- Begin Top Meta -->
+				
+				<!-- End Top Menta -->
+
+				<h1 class="posttitle">Carte interactive avec Dash et Plotly</h1>
+				
+			</div>
+
+			<!-- Begin Featured Image -->
+			
+<a href="https://fcosse.herokuapp.com">Lien vers le tableau de bord</a>	
+<br><br>		<!-- End Featured Image -->
+
+			<!-- Begin Post Content -->
+			<pre><code class="language-python">import pandas as pd
+import dash_bootstrap_components as dbc
+import plotly.express as px
+import dash
+from dash import dcc
+from dash import html
+from dash.dependencies import Input, Output
+
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+server = app.server
+
+gdf = pd.read_csv(
+    "https://raw.githubusercontent.com/dbouquin/IS_608/master/NanosatDB_munging/Countries-Continents.csv"
+)
+df = pd.read_csv("https://raw.githubusercontent.com/flcosse/script/main/global_power_plant_database.csv")
+df = df.rename(
+    columns={
+        "country_long": "Country",
+    }
+)
+ce = pd.read_csv("https://raw.githubusercontent.com/flcosse/script/main/countries.csv")
+df = pd.merge(df, gdf, on="Country", how="outer")
+
+df = df[df["Continent"] == "Europe"]
+df = df[
+    [
+        "Country",
+        "name",
+        "capacity_mw",
+        "latitude",
+        "longitude",
+        "primary_fuel",
+        "estimated_generation_gwh_2017",
+    ]
+]
+
+df = df.rename(
+    columns={
+        "primary_fuel": "Origine",
+        "estimated_generation_gwh_2017": "Génération estimée (gwh)",
+    }
+)
+
+df["Origine"] = df["Origine"].replace(
+    [
+        "Coal",
+        "Wind",
+        "Hydro",
+        "Solar",
+        "Gas",
+        "Oil",
+        "Nuclear",
+        "Biomass",
+        "Waste",
+        "Other",
+        "Geothermal",
+    ],
+    [
+        "Charbon",
+        "Eolienne",
+        "Hydraulique",
+        "Solaire",
+        "Gaz",
+        "Fioul",
+        "Nucléaire",
+        "Biomasse",
+        "Biogaz",
+        "Autre",
+        "Géothermie",
+    ],
+)
+
+c = {
+    "Biomasse": "#c68c53",
+    "Charbon": "#333333",
+    "Biogaz": "#cc00cc",
+    "Eolienne": "#39ac73",
+    "Gaz": "hotpink",
+    "Hydraulique": "#0066ff",
+    "Nucléaire": "#ff3333",
+    "Fioul": "#804000",
+    "Solaire": "#ffd11a",
+    "Autre": "dimgray",
+    "Stockage": "purple",
+}
+
+
+
+SIDEBAR_STYLE = {
+    "position": "fixed",
+    "top": 0,
+    "left": 0,
+    "bottom": 0,
+    "width": "16rem",
+    "padding": "2rem 1rem",
+    "background-color": "#f8f9fa",
+}
+
+CONTENT_STYLE = {
+    "margin-left": "18rem",
+    "margin-right": "2rem",
+    "padding": "2rem 1rem",
+}
+
+sidebar = html.Div(
+    [
+        html.H2("Europe", className="display-4"),
+        html.Hr(),
+        html.P(
+            "Données sur l'énergie Source : World Ressource Institute", className="lead"
+        ),
+        dbc.Nav(
+            [
+                dbc.NavLink("Vue générale", href="/", active="exact"),
+                dbc.NavLink("Par nation", href="/nation", active="exact"),
+            ],
+            vertical=True,
+            pills=True,
+        ),
+    ],
+    style=SIDEBAR_STYLE,
+)
+
+content = html.Div(id="page-content", children=[], style=CONTENT_STYLE)
+
+app.layout = html.Div([dcc.Location(id="url"), sidebar, content])
+config = {"displayModeBar": False}
+
+
+@app.callback(Output("page-content", "children"), [Input("url", "pathname")])
+def render_page_content(pathname):
+    if pathname == "/":
+        return [
+            html.Div(
+                [
+                    dcc.Dropdown(
+                        id="my_checklist",
+                        options=[
+                            {"label": "Charbon", "value": "Charbon"},
+                            {"label": "Eolienne", "value": "Eolienne"},
+                            {"label": "Gaz", "value": "Gaz"},
+                            {"label": "Hydraulique", "value": "Hydraulique"},
+                            {"label": "Nucléaire", "value": "Nucléaire"},
+                            {"label": "Fioul", "value": "Fioul"},
+                            {"label": "Solaire", "value": "Solaire"},
+                        ],
+                        value=["Charbon"],
+                        multi=True,
+                        clearable=False,
+                        style={
+                            "width": "auto",
+                            "padding": "0px 0px 2px 0px",
+                            "border-radius": "0px",
+                            "top": "-2vh",
+                        },
+                    ),
+                    html.Div(
+                        [
+                            html.Div(
+                                [
+                                    dcc.Graph(
+                                        id="the_graph",
+                                        style={"height": "87vh"},
+                                        config=config,
+                                    )
+                                ]
+                            ),
+                        ]
+                    ),
+                ]
+            ),
+        ]
+    elif pathname == "/nation":
+        return [
+            html.Div(
+                [
+                    dcc.Dropdown(
+                        id="slct_year",
+                        options=[
+                            {"label": "France", "value": "France"},
+                            {"label": "Allemagne", "value": "Germany"},
+                            {"label": "Espagne", "value": "Spain"},
+                            {"label": "Italie", "value": "Italy"},
+                            {"label": "Portugal", "value": "Portugal"},
+                        ],
+                        value="France",
+                        multi=False,
+                        clearable=False,
+                        style={
+                            "width": "16vh",
+                            "top": "-0.2vh",
+                            "position": "fixed",
+                            "z-index": "9",
+                            "border-radius": "0px",
+                            "filter": "drop-shadow(0 0 0.02rem grey)",
+                        },
+                    ),
+                    html.Div(
+                        [
+                            dcc.Graph(
+                                id="graph3",
+                                figure=[],
+                                style={
+                                    "height": "90vh",
+                                    "top": "7vh",
+                                },
+                                config=config,
+                            ),
+                        ]
+                    ),
+                    html.Hr(),
+                    html.Div(
+                        [
+                            dcc.Graph(
+                                id="graph1",
+                                figure=[],
+                                style={
+                                    "width": "50%",
+                                    "height": "40vh",
+                                    "float": "left",
+                                    "padding": "1vh",
+                                    "filter": "drop-shadow(0 0 0.05rem grey)",
+                                },
+                                config=config,
+                            ),
+                        ]
+                    ),
+                    html.Div(
+                        [
+                            dcc.Graph(
+                                id="graph4",
+                                figure=[],
+                                style={
+                                    "width": "50%",
+                                    "height": "40vh",
+                                    "float": "left",
+                                    "padding": "1vh",
+                                    "filter": "drop-shadow(0 0 0.05rem grey)",
+                                },
+                                config=config,
+                            ),
+                        ]
+                    ),
+                    html.Div(
+                        [
+                            dcc.Graph(
+                                id="graph2",
+                                figure=[],
+                                style={
+                                    "width": "50%",
+                                    "height": "40vh",
+                                    "float": "left",
+                                    "padding": "1vh",
+                                    "filter": "drop-shadow(0 0 0.05rem grey)",
+                                },
+                                config=config,
+                            ),
+                        ]
+                    ),
+                    html.Div(
+                        [
+                            dcc.Graph(
+                                id="graph5",
+                                figure=[],
+                                style={
+                                    "width": "50%",
+                                    "height": "40vh",
+                                    "float": "left",
+                                    "padding": "1vh",
+                                    "filter": "drop-shadow(0 0 0.05rem grey)",
+                                },
+                                config=config,
+                            ),
+                        ]
+                    ),
+                ]
+            ),
+        ]
+
+
+@app.callback(
+    Output(component_id="the_graph", component_property="figure"),
+    [Input(component_id="my_checklist", component_property="value")],
+)
+def update_graph(options_chosen):
+    dff = df.copy()
+    dff = dff[dff["Origine"].isin(options_chosen)]
+    dff["Génération estimée (gwh)"] = dff["Génération estimée (gwh)"].fillna(0)
+    px.set_mapbox_access_token(open(".mapbox_token.txt").read())
+    fig = px.scatter_mapbox(
+        dff,
+        lat=dff["latitude"],
+        lon=dff["longitude"],
+        color=dff["Origine"],
+        size=dff["Génération estimée (gwh)"],
+        size_max=30,
+        zoom=3,
+        color_discrete_map=c,
+        custom_data=["Origine", "Génération estimée (gwh)", "name"],
+        title="Sites de production d'électricité par type d'énergie",
+        mapbox_style="light",
+        center={"lat": 48.4889191993939, "lon": 16.793357414739376},
+    )
+    fig.update_traces(
+        hovertemplate="<br>".join(
+            [
+                "Y : %{lat:.2f}",
+                "X : %{lon:.2f}",
+                "Génération : %{customdata[1]:.0f} GWh",
+                "Nom : %{customdata[2]}",
+            ]
+        )
+    )
+    fig.update_layout(legend=dict(yanchor="top", y=1, xanchor="left", x=0, bgcolor='rgba(250,250,250,.8)'))
+    fig.update_layout(margin={"r": 0, "l": 0, "b": 0, "t": 30})
+    fig.update_layout(legend_itemdoubleclick=False)
+    return fig
+
+
+@app.callback(
+    Output(component_id="graph4", component_property="figure"),
+    [Input(component_id="slct_year", component_property="value")],
+)
+def update_graph(option_slctd):
+    source = []
+    dff = df.copy()
+    dff = dff.dropna()
+    dff = dff[dff["Country"] == option_slctd]
+    dff = dff.groupby(["Origine"]).sum("capacity_mw").reset_index()
+    perc = [(i / sum(dff["capacity_mw"]) * 100) for i in dff["capacity_mw"]]
+    dff["Pourcentage"] = perc
+    dff["Pourcentage"] = dff["Pourcentage"].astype(int)
+    for i in dff["Origine"]:
+        if i == "Nucléaire":
+            source.append("Nucléaire")
+        elif i in ("Gaz", "Pétrole", "Charbon"):
+            source.append("Traditionnelles")
+        else:
+            source.append("Renouvelables")
+    dff["Sources"] = source
+    fig = px.histogram(
+        dff,
+        y="Pourcentage",
+        x="Sources",
+        color="Origine",
+        color_discrete_map=c,
+        title="Mix selon les capacités maximales de production",
+        orientation="v",
+    )
+    fig.update_layout(
+        xaxis_title="capacity_mw",
+    )
+    fig.update_layout(yaxis_title="", xaxis_title="Sources")
+    fig.update_traces(hovertemplate="<b>%{y:.0f}%")
+    fig.update_layout(margin={"r": 0, "l": 0, "b": 0, "t": 45})
+    fig.update_layout(
+        {
+            "plot_bgcolor": "rgb(248, 249, 250)",
+            "paper_bgcolor": "rgb(248, 249, 250)",
+        }
+    )
+    fig.layout.xaxis.fixedrange = True
+    fig.layout.yaxis.fixedrange = True
+    fig.update_yaxes(zeroline=True, zerolinewidth=1, zerolinecolor='lightgray')
+    fig.update_yaxes(showgrid=True, gridwidth=0.2, gridcolor="lightgray")
+    fig.update_layout(legend_itemdoubleclick=False)
+    return fig
+
+
+@app.callback(
+    Output(component_id="graph1", component_property="figure"),
+    [Input(component_id="slct_year", component_property="value")],
+)
+def update_graph(option_slctd):
+    source = []
+    dff = df.copy()
+    dff = dff.dropna()
+    dff = dff[dff["Country"] == option_slctd]
+    dff = dff.groupby(["Origine"]).sum("Génération estimée (gwh)").reset_index()
+    perc = [(i / sum(dff["Génération estimée (gwh)"]) * 100) for i in dff["Génération estimée (gwh)"]]
+    dff["Pourcentage"] = perc
+    dff["Pourcentage"] = dff["Pourcentage"].astype(int)
+    for i in dff["Origine"]:
+        if i == "Nucléaire":
+            source.append("Nucléaire")
+        elif i in ("Gaz", "Pétrole", "Charbon"):
+            source.append("Traditionnelles")
+        else:
+            source.append("Renouvelables")
+    dff["Sources"] = source
+    fig = px.histogram(
+        dff,
+        y="Pourcentage",
+        x="Sources",
+        color="Origine",
+        color_discrete_map=c,
+        title="Mix énergétique du pays (2017)",
+        orientation="v",
+    )
+    fig.update_layout(
+        xaxis_title="Génération (GWh)",
+    )
+    fig.update_layout(yaxis_title="", xaxis_title="Sources")
+    fig.update_traces(hovertemplate="<b>%{y:.0f}%")
+    fig.update_layout(margin={"r": 0, "l": 0, "b": 0, "t": 45})
+    fig.update_layout(
+        {
+            "plot_bgcolor": "rgb(248, 249, 250)",
+            "paper_bgcolor": "rgb(248, 249, 250)",
+        }
+    )
+    fig.layout.xaxis.fixedrange = True
+    fig.layout.yaxis.fixedrange = True
+    fig.update_yaxes(zeroline=True, zerolinewidth=1, zerolinecolor='lightgray')
+    fig.update_yaxes(showgrid=True, gridwidth=0.2, gridcolor="lightgray")
+    fig.update_layout(legend_itemdoubleclick=False)
+    return fig
+
+
+@app.callback(
+    Output(component_id="graph2", component_property="figure"),
+    [Input(component_id="slct_year", component_property="value")],
+)
+def plot(pays):
+    dff = df.copy()
+    dff = dff[dff["Country"] == pays]
+    dff = dff.sort_values(by=["Génération estimée (gwh)"], ascending=False)
+    dff = dff.dropna()
+    dff["Rang"] = dff["Génération estimée (gwh)"].rank(ascending=False)
+    fig = px.scatter(
+        dff,
+        x="Rang",
+        y="Génération estimée (gwh)",
+        color="Origine",
+        color_discrete_map=c,
+        title="Rang des unités de production",
+        custom_data=["Origine", "Génération estimée (gwh)", "name"],
+        log_y=True,
+    )
+    fig.update_layout(
+        yaxis_title="Génération (GWh)",
+    )
+    fig.update_traces(
+        hovertemplate="<br>".join(
+            [
+                "Rang : %{x}",
+                "Génération : %{y:.2f} GWh",
+                "Nom : %{customdata[2]}",
+            ]
+        )
+    )
+    fig.update_layout(margin={"r": 0, "l": 0, "b": 0, "t": 45})
+    fig.update_layout(
+        {
+            "plot_bgcolor": "rgb(248, 249, 250)",
+            "paper_bgcolor": "rgb(248, 249, 250)",
+        }
+    )
+    fig.update_xaxes(showgrid=True, gridwidth=0.1, gridcolor="lightgray")
+    fig.update_yaxes(showgrid=True, gridwidth=0.1, gridcolor="lightgray")
+    fig.update_xaxes(zeroline=True, zerolinewidth=1, zerolinecolor='lightgray')
+    fig.layout.xaxis.fixedrange = True
+    fig.layout.yaxis.fixedrange = True
+    fig.update_layout(legend_itemdoubleclick=False)
+    return fig
+
+
+@app.callback(
+    Output(component_id="graph3", component_property="figure"),
+    [Input(component_id="slct_year", component_property="value")],
+)
+def carto(pays):
+    px.set_mapbox_access_token(open(".mapbox_token.txt").read())
+    dff = df.copy()
+    dff = dff.dropna()
+    dff = dff[dff["Country"] == pays]
+    centroid = ce.copy()
+    centroid = centroid[centroid["name"]==pays]
+    fig = px.scatter_mapbox(
+        dff,
+        lat=dff["latitude"],
+        lon=dff["longitude"],
+        color=dff["Origine"],
+        size=dff["Génération estimée (gwh)"],
+        size_max=50,
+        zoom=5,
+        color_discrete_map=c,
+        custom_data=["Origine", "Génération estimée (gwh)", "name"],
+        title="Localisation des unités de production",
+        mapbox_style="light",
+        center={"lat":centroid["latitude"].values[0], "lon":centroid["longitude"].values[0] },
+    )
+    fig.update_traces(
+        hovertemplate="<br>".join(
+            [
+                "Génération : %{customdata[1]:.0f} GWh",
+                "Nom : %{customdata[2]}",
+            ]
+        )
+    )
+    fig.update_layout(legend=dict(yanchor="top", y=1, xanchor="left", x=0, bgcolor='rgba(250,250,250,.8)'))
+    fig.update_layout(margin={"r": 0, "l": 0, "b": 0, "t": 60})
+    fig.update_layout(legend_itemdoubleclick=False)
+    return fig
+
+
+@app.callback(
+    Output(component_id="graph5", component_property="figure"),
+    [Input(component_id="slct_year", component_property="value")],
+)
+def prop(pays):
+    dff = df.copy()
+    dff = dff[dff["Country"] == pays]
+    dff = dff.groupby(["Origine"]).size().reset_index(name="Nombre")
+    fig = px.pie(
+        dff,
+        values="Nombre",
+        names="Origine",
+        color="Origine",
+        color_discrete_map=c,
+        title="Nombre d'unités de production pager type",
+    )
+    fig.update_layout(margin={"r": 0, "l": 0, "b": 0, "t": 45})
+    fig.update_traces(hovertemplate="%{label} : %{value} (%{percent})")
+    fig.update_traces(textinfo="value")
+    fig.update_layout(
+        {
+            "plot_bgcolor": "rgb(248, 249, 250)",
+            "paper_bgcolor": "rgb(248, 249, 250)",
+        }
+    )
+    fig.update_layout(legend_itemdoubleclick=False)
+    return fig
+
+
+if __name__ == "__main__":
+    app.run_server(debug=False)
+
+</code></pre>
+<br>
+			<!-- End Post Content -->
+
+			<!-- Begin Tags -->
+
+			<!-- End Tags -->
+
+		</div>
+		<!-- End Post -->
+
+	</div>
+</div>
+<!-- End Article
+================================================== -->
+
+
+
+<!-- Begin Related
+================================================== -->
+
+
+<!-- Begin Twitter Timeline
+================================================== -->
+
+<!-- End Twitter Timeline
+================================================== -->
+
+<!-- Begin AlertBar
+================================================== -->
+
+<!-- End AlertBar
+================================================== -->
+
+<!-- Begin Footer
+================================================== -->
+<!-- End Footer
+================================================== -->
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="assets/js/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+<script src="assets/js/bootstrap.min.js"></script>
+<script src="assets/js/ie10-viewport-bug-workaround.js"></script>
+<script src="assets/js/mediumish.js"></script>
+</body>
+</html>

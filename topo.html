@@ -6,7 +6,7 @@
 <meta name="description" content="">
 <meta name="auteur" content="">
 <link rel="icon" href="imagr/planet-earth.png">
-<title>Profil topographique</title>
+<title>Profil altimétrique</title>
 <!-- Bootstrap core CSS -->
 <link href="assets/css/bootstrap.min.css" rel="stylesheet">
 <!-- Fonts -->
@@ -89,232 +89,217 @@
 				
 				<!-- End Top Menta -->
 
-				<h1 class="posttitle">Profil topographique avec PyQGIS</h1>
+				<h1 class="posttitle">Profil altimétrique avec PyQGIS</h1>
 				
 			</div>
 
 			<!-- Begin Featured Image -->
-			<iframe src="profil.html"scrolling="no"frameBorder="0" height="72%" width="150%" title="" style="margin-left: -23%"></iframe>
+			<iframe src="profil.html"scrolling="no"frameBorder="0" height="70%" width="150%" title="" style="margin-left: -24%"></iframe>
 			<!-- End Featured Image -->
      
 			<!-- End Featured Image -->
 
 			<!-- Begin Post Content -->
 			<div class="article-post">
-				<pre><code class="language-python" style="font-size: 85%;">import plotly.graph_objects as go
+				<pre><code class="language-python" style="font-size: 85%;">from statistics  import mean
+import plotly.graph_objects as go
 import numpy as np
-import uuid
 
-iface.addVectorLayer("C:\packages\COMMUNE EUROPE/COMM_RG_01M_2016_4326.shp","Communes","ogr")
-raster= "C:\packages/raster pyre.tif"
-iface.addRasterLayer(raster,'SRTM','gdal')
-unique_filename3 = str(uuid.uuid4())
-unique_filename4 = str(uuid.uuid4())
-unique_filename5 = str(uuid.uuid4())
-unique_filename6 = str(uuid.uuid4())
-unique_filename7 = str(uuid.uuid4())
-unique_filename8 = str(uuid.uuid4())
-unique_filename9 = str(uuid.uuid4())
-vl1 = QgsVectorLayer("Point","Point1","memory")
-pr = vl1.dataProvider()
-f = QgsFeature()
-f.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(0.03618,42.92890)))
-pr.addFeature(f)
-vl1.updateExtents()
-QgsProject.instance().addMapLayer(vl1)
-unique_filename1 = str(uuid.uuid4())
-path = (f"C:/packages/TOPO/{unique_filename1}.shp")
-writer = QgsVectorFileWriter.writeAsVectorFormat(vl1,path,'utf-8',driverName='ESRI Shapefile')
-QgsProject.instance().removeMapLayer(vl1)
-vl1 = iface.addVectorLayer(f"C:/packages/TOPO/{unique_filename1}.shp","","ogr")
-feat = next(iface.activeLayer().getFeatures())
-vl1 = QgsGeometry.asPoint(feat.geometry())
-pxy1 = QgsPoint(vl1)
+iface.addVectorLayer("C:/Users/Florian/Desktop/département/COMMUNE.shp","","ogr")
 
-vl2 = QgsVectorLayer("Point","Point2","memory")
-pr = vl2.dataProvider()
-f = QgsFeature()
-f.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(0.10652,42.82869)))
-pr.addFeature(f)
-vl2.updateExtents()
-QgsProject.instance().addMapLayer(vl2)
-unique_filename2 = str(uuid.uuid4())
-path = (f"C:/packages/TOPO/{unique_filename2}.shp")
-writer = QgsVectorFileWriter.writeAsVectorFormat(vl2,path,'utf-8',driverName='ESRI Shapefile')
-QgsProject.instance().removeMapLayer(vl2)
-vl2 = iface.addVectorLayer(f"C:/packages/TOPO/{unique_filename2}.shp","","ogr")
-feat = next(iface.activeLayer().getFeatures())
-vl2 = QgsGeometry.asPoint(feat.geometry())
-pxy2 = QgsPoint(vl2)
+def point(nom,x,y,lien):
+    vl = QgsVectorLayer("Point", nom, "memory")
+    pr = vl.dataProvider()
+    pr.addAttributes([QgsField("nom", QVariant.String)])
+    vl.updateFields() 
+    f = QgsFeature()
+    f.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(x,y)))
+    f.setAttributes([""])
+    pr.addFeature(f)
+    vl.updateExtents() 
+    QgsProject.instance().addMapLayer(vl)
+    path = lien
+    writer = QgsVectorFileWriter.writeAsVectorFormat(vl,path,'utf-8',driverName='ESRI Shapefile')
+    QgsProject.instance().removeMapLayer(vl)
+    vl = iface.addVectorLayer(f"C:/Users/Florian/Desktop/département/{nom}.shp","","ogr")
+    feat = next(iface.activeLayer().getFeatures())
+    vl = QgsGeometry.asPoint(feat.geometry())
+    pxy1 = QgsPoint(vl)
 
+nom1 = "Point1"
+nom2= "Point2"
+coord1 = [-0.09770,43.19178]
+coord2 = [-0.3481,43.3170]
 
-start_point = pxy1
-end_point = pxy2
-v_layer = QgsVectorLayer('LineString?crs=epsg:4326', 'line', 'memory')
-path = (f"C:/packages/TOPO/{unique_filename5}.shp")
-pr = v_layer.dataProvider()
-seg = QgsFeature()
-seg.setGeometry(QgsGeometry.fromPolyline([start_point, end_point]))
-pr.addFeatures([ seg ])
-QgsProject.instance().addMapLayers([v_layer])
-iface.zoomToActiveLayer()
-writer = QgsVectorFileWriter.writeAsVectorFormat(v_layer,path,'utf-8',driverName='ESRI Shapefile')
-QgsProject.instance().removeMapLayer(v_layer)
-line = iface.addVectorLayer(f"C:/packages/TOPO/{unique_filename5}.shp","","ogr")
+point(nom1,coord1[0],coord1[1],f"C:/Users/Florian/Desktop/département/{nom1}.shp")
+point(nom2,coord2[0],coord2[1],f"C:/Users/Florian/Desktop/département/{nom2}.shp")
 
+def join(num,uri):
+    processing.run("qgis:joinbylocationsummary", 
+    {'INPUT':'C:/Users/Florian/Desktop/département/Point'+num+'.shp',
+    'JOIN':'C:/Users/Florian/Desktop/département/COMMUNE.shp',
+    'PREDICATE':[0],
+    'JOIN_FIELDS':[],
+    'SUMMARIES':[],
+    'DISCARD_NONMATCHING':False,
+    'OUTPUT':uri})
+    iface.addVectorLayer(uri,"","ogr")
+    
+join("2",f"C:/Users/Florian/Desktop/département/POINTN2.shp")
+join("1",f"C:/Users/Florian/Desktop/département/POINTN1.shp")
 
-fnout = (f"C:/packages/TOPO/{unique_filename3}.shp")
-fnpts = (f"C:/packages/TOPO/{unique_filename1}.shp")
-fnws = "C:\packages\COMMUNE EUROPE/COMM_RG_01M_2016_4326.shp"
+def rmvLyr(lyrname):
+    qinst = QgsProject.instance()
+    qinst.removeMapLayer(qinst.mapLayersByName(lyrname)[0].id())
+    
+for lyr in ['Point1', 'Point2']:
+    rmvLyr(lyr)
+    
+def rename(old):
+    vlayer  =QgsProject.instance().mapLayersByName(old)
+    nom = [f["NOM_COM_mi"] for f in vlayer[0].getFeatures()]
+    blockLayer = QgsProject.instance().mapLayersByName(old)[0] 
+    blockLayer.setName(nom[0])
 
-processing.run("native:joinattributesbylocation",
-{'INPUT':fnpts,
-'JOIN':fnws,
-'PREDICATE':[0],
-'JOIN_FIELDS':[],
-'METHOD':0,
-'DISCARD_NONMATCHING':False,
-'PREFIX':'',
-'OUTPUT':fnout})
-v1 = iface.addVectorLayer(f"C:/packages/TOPO/{unique_filename3}.shp","","ogr")
+def name(n):
+    vlayer  =QgsProject.instance().mapLayersByName(n)
+    nom = [f["NOM_COM_mi"] for f in vlayer[0].getFeatures()]
+    return nom
 
+nom1 = name("POINTN1")
+nom2 = name("POINTN2")
+rename("POINTN1")
+rename("POINTN2")
 
-fnout = (f"C:/packages/TOPO/{unique_filename4}.shp")
-fnpts = (f"C:/packages/TOPO/{unique_filename2}.shp")
-fnws = "C:\packages\COMMUNE EUROPE/COMM_RG_01M_2016_4326.shp"
+def line():
+    start_point = QgsPoint(coord1[0],coord1[1])
+    end_point = QgsPoint(coord2[0],coord2[1])
+    v_layer = QgsVectorLayer('LineString?crs=epsg:4326', 'line', 'memory')
+    path = (f"C:/Users/Florian/Desktop/département/Ligne.shp")
+    pr = v_layer.dataProvider()
+    seg = QgsFeature()
+    seg.setGeometry(QgsGeometry.fromPolyline([start_point, end_point]))
+    pr.addFeatures([ seg ])
+    QgsProject.instance().addMapLayers([v_layer])
+    iface.zoomToActiveLayer()
+    writer = QgsVectorFileWriter.writeAsVectorFormat(v_layer,path,'utf-8',driverName='ESRI Shapefile')
+    QgsProject.instance().removeMapLayer(v_layer)
+    line = iface.addVectorLayer(f"C:/Users/Florian/Desktop/département/Ligne.shp","","ogr")
 
-processing.run("native:joinattributesbylocation",
-{'INPUT':fnpts,
-'JOIN':fnws,
-'PREDICATE':[0],
-'JOIN_FIELDS':[],
-'METHOD':0,
-'DISCARD_NONMATCHING':False,
-'PREFIX':'',
-'OUTPUT':fnout})
-v1 = iface.addVectorLayer(f"C:/packages/TOPO/{unique_filename4}.shp","","ogr")
+line()
 
-project = QgsProject.instance()
-
-delete1 = project.mapLayersByName(unique_filename1)[-1]
-project.removeMapLayer(delete1.id())
-
-project = QgsProject.instance()
-
-delete1 = project.mapLayersByName(unique_filename2)[-1]
-project.removeMapLayer(delete1.id())
-layer1 = QgsVectorLayer(f"C:/packages/TOPO/{unique_filename3}.shp","","ogr")
-layer2 = QgsVectorLayer(f"C:/packages/TOPO/{unique_filename4}.shp","","ogr")
-project = QgsProject.instance()
-
-for nom1 in layer1.getFeatures():
-    print(nom1)
-rename = project.mapLayersByName(unique_filename3)[0]
-rename.setName(nom1["NAME_ASCI"])
-for nom2 in layer2.getFeatures():
-    print(nom2)
-rename = project.mapLayersByName(unique_filename4)[0]
-rename.setName(nom2["NAME_ASCI"])
-rename = project.mapLayersByName(unique_filename5)[0]
-rename.setName("Ligne topographique")
-delete2 = project.mapLayersByName("Ligne topographique")[0]
-project.removeMapLayer(delete2.id())
-line = QgsVectorLayer(f"C:/packages/TOPO/{unique_filename5}.shp","","ogr")
-centroides = ("C:/packages/TOPO/centre.shp","","ogr")
+line = QgsVectorLayer(f"C:/Users/Florian/Desktop/département/Ligne.shp","","ogr")
 d = QgsDistanceArea()
 d.setEllipsoid('WGS84')
+
 for feat in line.getFeatures():
     dist_point = (d.convertAreaMeasurement(d.measureLength(feat.geometry()),100))
-    dist_point1 = (d.convertAreaMeasurement(d.measureLength(feat.geometry()),100))
-print(dist_point)
-if dist_point < 500:
-    dist_point = 0.00001
-elif dist_point < 1000:
-    dist_point = 0.00005
-elif dist_point < 5000:
-    dist_point = 0.00006
-elif dist_point < 10000:
-    dist_point = 0.00008
-elif dist_point < 25000:
-    dist_point = 0.0005
-elif dist_point < 50000:
-    dist_point = 0.00008
-else:
-    dist_point = 0.00007
+    
+uri = f"C:/Users/Florian/Desktop/département/Relevés.shp"
+
 processing.run("native:pointsalonglines", 
-{'INPUT':line,
-'DISTANCE':dist_point,
+{'INPUT':'C:/Users/Florian/Desktop/département/Ligne.shp',
+'DISTANCE':dist_point/35000000,
 'START_OFFSET':0,
 'END_OFFSET':0,
-'OUTPUT':f"C:/packages/TOPO/{unique_filename6}.shp"})
-iface.addVectorLayer(f"C:/packages/TOPO/{unique_filename6}.shp",'','ogr')
-points_lignes = QgsVectorLayer(f"C:/packages/TOPO/{unique_filename6}.shp")
-delete = project.mapLayersByName(unique_filename6)[0]
-project.removeMapLayer(delete.id())
+'OUTPUT':uri})
+
+iface.addVectorLayer(uri,"","ogr")
+iface.addRasterLayer("C:/Users/Florian/Downloads/EUDEM/eu_dem_v11_E30N20.TIF","Raster","gdal")
+
+uri = f"C:/Users/Florian/Desktop/département/raster.shp"
 
 processing.run("native:rastersampling", 
-{'INPUT':points_lignes,
-'RASTERCOPY':raster,
+{'INPUT':'C:/Users/Florian/Desktop/département/Relevés.shp',
+'RASTERCOPY':'C:/Users/Florian/Downloads/EUDEM/eu_dem_v11_E30N20.TIF',
 'COLUMN_PREFIX':'SAMPLE_',
-'OUTPUT':f"C:/packages/TOPO/{unique_filename7}.shp"})
-iface.addVectorLayer(f"C:/packages/TOPO/{unique_filename7}.shp",'','ogr')
-points_raster = QgsVectorLayer(f"C:/packages/TOPO/{unique_filename7}.shp",'','ogr')
+'OUTPUT':uri})
+iface.addVectorLayer(uri,"","ogr")
 
-rename = project.mapLayersByName(unique_filename7)[-1]
-rename.setName("Points avec valeurs raster")
-y = []
-x = []
-for f in points_raster.getFeatures():
-    y.append(f["SAMPLE_1"])
-
-processing.run("qgis:exportaddgeometrycolumns", 
-{'INPUT':line,
-'CALC_METHOD':1,
-'OUTPUT':f"C:/packages/TOPO/{unique_filename8}.shp"})
-iface.addVectorLayer(f"C:/packages/TOPO/{unique_filename8}.shp","","ogr")
-line = QgsVectorLayer(f"C:/packages/TOPO/{unique_filename8}.shp","","ogr")
-rename = project.mapLayersByName(unique_filename8)[0]
-rename.setName("Ligne topographique")
+uri = f"C:/Users/Florian/Desktop/département/matrice.shp"
 
 processing.run("qgis:distancematrix",
-{'INPUT':f"C:/packages/TOPO/{unique_filename7}.shp",
-'INPUT_FIELD':'distance',
-'TARGET':f"C:/packages/TOPO/{unique_filename4}.shp",
+{'INPUT':'C:/Users/Florian/Desktop/département/raster.shp',
+'INPUT_FIELD':'FID',
+'TARGET':'C:/Users/Florian/Desktop/département/raster.shp',
 'TARGET_FIELD':'FID',
-'MATRIX_TYPE':0,
+'MATRIX_TYPE':1,
 'NEAREST_POINTS':0,
-'OUTPUT':f"C:/packages/TOPO/{unique_filename9}.shp"})
-point_dist = QgsVectorLayer(f"C:/packages/TOPO/{unique_filename9}.shp","","ogr")
+'OUTPUT':uri})
+iface.addVectorLayer(uri,"","ogr")
 
-iface.addVectorLayer(f"C:/packages/TOPO/{unique_filename9}.shp","","ogr")
-for f in point_dist.getFeatures():
-    x.append(f["Distance"])
+matrice  =QgsProject.instance().mapLayersByName("matrice")
+x = [f["0"] for f in matrice[0].getFeatures()]
+haut  =QgsProject.instance().mapLayersByName("raster")
+y = [f["SAMPLE_1"] for f in haut[0].getFeatures()]
+x = [ '%.0f' % i for i in x ]
+y = [ '%.1f' % i for i in y ]
 
-x.append(0)
-x.sort()
-y1 = y
-y.insert(0,y[0])
-x = np.array(x)
-y = np.array(y)
-if dist_point1 > 5000:
-    x[:] = [f / 1000 for f in x]
+layer = QgsVectorLayer(uri,"points","ogr")
+X1 = []
+Y1 = []
 
-fig = go.Figure()
-fig.add_trace(go.Scatter(
-    x=x,
-    y=y,
-    name="Profil topographique",marker=dict(
-            color='saddlebrown')
-))
-fig.update_layout(hovermode="x"
-    title=f"Profil topographique de {(nom1['NAME_ASCI'])} - {(nom2['NAME_ASCI'])}",
-    xaxis_title="Distance (en km)",
-    yaxis_title="Altitude (en m)",
+for i in layer.getFeatures():
+    geom = i.geometry()
+    X1.append(geom.asPoint().x())
+    Y1.append(geom.asPoint().y())
+
+X1 = [round(x, 3) for x in X1]
+Y1 = [round(x, 3) for x in Y1]
+x = [int(i) for i in x]
+y = [float(i) for i in y]
+
+fig = go.Figure(
+    data=[
+        go.Scatter(
+            customdata=np.stack((X1, Y1), axis=1),
+            x=x,
+            y=y,
+            hovertemplate="Distance : %{x:.0f}m<br>Altitude : %{y:.0f}m<br>X : %{customdata[0]:.3f}<br>Y : %{customdata[1]:.3f}<extra></extra>",
+            fill="tozeroy",
+            line_color="rgba(0, 204, 150, 1)",
+            mode="lines",
+            fillcolor="rgba(0, 204, 150, 0.25)",
+        )
+    ],
+    layout=dict(title=dict(text=f"Profil altimétrique, {nom1[0]} - {nom2[0]}")),
 )
 
-fig.write_html('C:/Users/33788/Desktop/html/filename.html')
+fig.update_layout(hoverlabel=dict(bgcolor="white", font_size=12, font_family="Arial"))
+moyenne = mean(y)
+moyenne = round(moyenne, 1)
+
+maxi = int(round(float(max(y))))
+mini = int(round(float(min(y))))
+
+fig.update(layout_yaxis_range=[mini * 0.9, maxi * 1.1])
+pente = round(((min(y) - max(y)) / max(x)) * 100, 1)
+fig.write_image(f"C:/Users/Florian/Desktop/AASITE/public_html/imagr/profil.svg")
+
+fig.add_annotation(
+    text=f"<i>Longueur : {max(x)}m / Dénivelé : {round(min(y)-max(y),1)}m / Moyenne : {moyenne}m / Pente : {pente}%</i>",
+    xref="paper",
+    yref="paper",
+    x=0.5,
+    y=-0.15,
+    showarrow=False,
+)
+fig.add_annotation(
+    text=f"<i>Départ : {coord1[0]} / {coord1[1]} - Arrivée : {coord2[0]} / {coord2[1]} </i>",
+    xref="paper",
+    yref="paper",
+    x=-0.03,
+    y=1.085,
+    showarrow=False,
+)
+fig.update_layout(hovermode="x")
+fig.update_xaxes(title_text="Distance")
+fig.update_yaxes(title_text="Altitude")
+
+fig.write_html(f"C:/Users/Florian/Desktop/AASITE/public_html/profil.html")
 </code></pre>
-			</div>
+<br>
+
 			<!-- End Post Content -->
 
 			<!-- Begin Tags -->

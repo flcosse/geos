@@ -93,18 +93,15 @@
 
 			<!-- Begin Featured Image -->
 			
-			<iframe src="file.html"scrolling="no"frameBorder="0" height="60%" width="100%" title="Iframe Example" style="margin-left: 5%;"></iframe>
+			<iframe src="file.html"scrolling="no"frameBorder="0" height="60%" width="80%" title="Iframe Example" style="margin-left: 14%;"></iframe>
 			<!-- End Featured Image -->
 
 			<!-- Begin Post Content -->
-			<pre><code class="language-python">import pandas as pd
-import numpy as np
-import plotly.graph_objects as go
-from plotly.offline import plot
-from plotly.subplots import make_subplots
-import plotly.graph_objects as go
+			<pre><code class="language-python">import numpy as np
+import pandas as pd
+import plotly.express as px
 
-ville = "Pau"
+ville = "Pontacq"
 outpt = "C:/Users/Florian/Desktop/sortie.gpkg"
 processing.run("quickosm:downloadosmdatainareaquery", 
 {'KEY':'landuse',
@@ -240,8 +237,8 @@ color = {
     "Terres agricoles": "gold",
     "Militaire": "peru",
     "Industriel": "red",
-    "Pré/prairie": "gold",
-    "Terres boisées": "sienna",
+    "Pré/prairie": "wheat",
+    "Terres boisées": "Green",
     "Autre": "lightgrey",
     "Zones résidentielles": "orangered",
     "Marché": "brown",
@@ -270,11 +267,16 @@ for i, j in color.items():
     for k in liste:
         if i == k:
             set.append(j)
-
-fig = go.Figure(
-    data=[go.Pie(labels=df["Landuse"], values=df["surface"], marker_colors=set)]
+color = dict(zip(liste, set))
+fig = px.pie(
+    df,
+    values="surface",
+    names="Landuse",
+    color="Landuse",
+    color_discrete_map=color,
 )
 
+fig.update_traces(hovertemplate='Occupation : %{label}<br>Surface : %{value}km²')
 fig.update_layout(
     title=f"Répartition de l'occupation du sol dans la ville de {ville}",
     font=dict(
@@ -284,7 +286,8 @@ fig.update_layout(
 )
 
 fig.update_layout(font_family="Arial")
-fig.write_html("C:/Users/Florian/Desktop/AASITE/mediumish-html/file.html")
+fig.write_html(f"C:/Users/Florian/Desktop/AASITE/public_html/file.html")
+fig.write_image(f"C:/Users/Florian/Desktop/AASITE/public_html/imagr/Pontacq.svg")
 fig.show()
 </code></pre>
 <br>

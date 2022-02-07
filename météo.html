@@ -143,6 +143,7 @@ def moyenne(x):
     return np.repeat(me, len(x)).tolist()
 
 fig = make_subplots(rows=2, cols=2)
+config = {'displayModeBar': True}
 
 def figure(d, a, b, t, z, nom, co):
     fig.add_trace(
@@ -151,8 +152,10 @@ def figure(d, a, b, t, z, nom, co):
             y=z,
             name=nom,
             marker_color=co,
-            hovertemplate="%{y}°C",
+            hovertemplate="<b>%{y}°C</b>",
             line=dict(width=3),
+            legendgroup="Saison",
+            legendgrouptitle_text="<b>Saisons"
         ),
         a,
         b,
@@ -166,13 +169,24 @@ def figure(d, a, b, t, z, nom, co):
         y=arr(Z),
         mode="lines",
         showlegend=t,
-        hovertemplate="%{y:.1f}°C",
-        line=dict(color="red"),
-        legendgroup="group1",
+        hovertemplate="<b>%{y:.1f}°C</b>",
+        line=dict(color="red",width=3),
+        legendgroup="Statistique",
+        legendgrouptitle_text="<b>Statistique"
     )
     fig.append_trace(reg, a, b)
-    fig.update_layout(hovermode="x unified")
+    fig.update_layout(
+        {
+            "plot_bgcolor": "rgb(249,249,249)",
+            "paper_bgcolor": "white",
+        }
+    )
+    chiffre = 220
+    color = f"rgb({chiffre}, {chiffre}, {chiffre})"
+    fig.update_xaxes(showgrid=True, gridwidth=0.1, gridcolor=color)
+    fig.update_yaxes(showgrid=True, gridwidth=0.1, gridcolor=color)
 
+    fig.update_layout(hovermode="x")
 
 figure(y(moyenne(liste(filtre(saison(df,12,1,2))["TAVG"]))),1,1,False,y(liste(filtre(saison(df,12,1,2))["TAVG"])),"Hiver","royalblue")
 figure(y(moyenne(liste(filtre(saison(df,6,7,8))["TAVG"]))),1,2,False,y(liste(filtre(saison(df,6,7,8))["TAVG"])),"Eté","#FFD700")
@@ -182,13 +196,14 @@ figure(y(moyenne(liste(filtre(saison(df,3,4,5))["TAVG"]))),2,2,True,y(liste(filt
 fig.update_layout(title_text=f'Températures moyennes par années et par saisons<br>Station : {nom.title()}',
     autosize=False,
     width=1100,
-    height=800,legend_title_text='Saison :') 
+    height=800)
+
 fig.add_annotation(text="Source : Données NOAA (National Oceanic and Atmospheric Administration)",
                   xref="paper", yref="paper",
                   x=-0.03, y=-0.1, showarrow=False)
 
-
 fig.write_html(f"C:/Users/Florian/Desktop/AASITE/public_html/met.html")
+
 fig.show()
 </code></pre>
 <br>

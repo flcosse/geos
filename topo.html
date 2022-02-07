@@ -131,6 +131,7 @@ nom2= "Point2"
 coord1 = [-0.09770,43.19178]
 coord2 = [-0.3481,43.3170]
 
+
 point(nom1,coord1[0],coord1[1],f"C:/Users/Florian/Desktop/département/{nom1}.shp")
 point(nom2,coord2[0],coord2[1],f"C:/Users/Florian/Desktop/département/{nom2}.shp")
 
@@ -259,8 +260,8 @@ fig = go.Figure(
             fill="tozeroy",
             line_color="rgba(0, 204, 150, 1)",
             mode="lines",
-            fillcolor="rgba(0, 204, 150, 0.25)",
-        )
+            fillcolor="rgba(0, 204, 150, 0.18)",
+            hoverinfo="none")
     ],
     layout=dict(title=dict(text=f"Profil altimétrique, {nom1[0]} - {nom2[0]}")),
 )
@@ -272,8 +273,23 @@ moyenne = round(moyenne, 1)
 maxi = int(round(float(max(y))))
 mini = int(round(float(min(y))))
 
+pente = round(((min(y) -max(y)) / max(x)) * 100, 1)
+fig.update_layout(
+        {
+            "plot_bgcolor": "white",
+            "paper_bgcolor": "white",
+        }
+    )
+
+fig.update_xaxes(zeroline=True, zerolinewidth=1, zerolinecolor='darkgrey')
+fig.update_yaxes(zeroline=True, zerolinewidth=1, zerolinecolor='darkgrey')
+chiffre = 240
+color = f"rgb({chiffre}, {chiffre}, {chiffre})"
+fig.update_yaxes(showgrid=True, gridwidth=.1,gridcolor=color)
+fig.update_xaxes(showgrid=True,gridwidth=.1, gridcolor=color)
+
+fig.update_layout(legend_itemdoubleclick=False)
 fig.update(layout_yaxis_range=[mini * 0.9, maxi * 1.1])
-pente = round(((min(y) - max(y)) / max(x)) * 100, 1)
 fig.write_image(f"C:/Users/Florian/Desktop/AASITE/public_html/imagr/profil.svg")
 
 fig.add_annotation(
@@ -292,9 +308,16 @@ fig.add_annotation(
     y=1.085,
     showarrow=False,
 )
-fig.update_layout(hovermode="x")
+fig.update_layout(hovermode='x unified', legend=dict(title= None), hoverlabel=dict(bgcolor='rgba(255,255,255,0.75)',
+                                                                                  font=dict(color='black')))
+
 fig.update_xaxes(title_text="Distance")
 fig.update_yaxes(title_text="Altitude")
+
+fig.update_xaxes(showspikes=True, spikecolor="DarkGray", spikesnap="data",spikethickness=2, spikemode="toaxis+across",spikedash="dash")
+fig.update_yaxes(showspikes=True, spikecolor="DarkGray", spikesnap="data", spikethickness=2,spikemode="toaxis+across",spikedash="dash")
+fig.update_layout(spikedistance=1000, hoverdistance=100)
+
 
 fig.write_html(f"C:/Users/Florian/Desktop/AASITE/public_html/profil.html")
 </code></pre>

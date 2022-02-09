@@ -116,62 +116,86 @@ headers = {
     'Authorization': '5b3ce3597851110001cf6248df22650771d94c06a73d6fb78ba4706b',
     'Content-Type': 'application/json; charset=utf-8'
 }
-call = requests.post('https://api.openrouteservice.org/v2/isochrones/driving-car', json=body, headers=headers)
+call = requests.post(
+    "https://api.openrouteservice.org/v2/isochrones/driving-car",
+    json=body,
+    headers=headers,
+)
 call = call.json()
 m = folium.Map(location=[loc[0][-1], loc[0][0]], zoom_start=10, tiles="Stamen Toner")
 
 with open("data.json", "w") as f:
     json.dump(call, f)
+lat = round(loc[0][-1], 2)
+lon = round(loc[0][0], 2)
 
 gdf = gpd.read_file("data.json")
 gdf["geometry"][1] = gdf["geometry"][1].difference(gdf["geometry"][0])
 gdf["geometry"][2] = gdf["geometry"][2].difference(gdf["geometry"][0])
 gdf["geometry"][2] = gdf["geometry"][2].difference(gdf["geometry"][1])
-color = ["LimeGreen","#FDFF4B","#FF4B4B"]
+color = ["LimeGreen", "#FDFF4B", "#FF4B4B"]
 op = 0.8
 
-folium.Marker(location=[loc[0][-1], loc[0][0]], popup="Départ",icon=folium.Icon(color='blue', icon="car", prefix='fa')).add_to(m)
-
-
-folium.GeoJson(
-    gdf["geometry"][0],
-    style_function=lambda x: {
-        "fillColor": color[0],
-        "color": color[0],
-        "weight": 1,
-        "fillOpacity": op,
-    },
-).add_to(m)
-folium.GeoJson(
-    gdf["geometry"][1],
-    style_function=lambda x: {
-        "fillColor": color[1],
-        "color": color[1],
-        "weight": 1,
-        "fillOpacity": op,
-    },
-).add_to(m)
-folium.GeoJson(
-    gdf["geometry"][2],
-    style_function=lambda x: {
-        "fillColor": color[2],
-        "color": color[2],
-        "weight": 1,
-        "fillOpacity": op,
-    },
+folium.Marker(
+    location=[loc[0][-1], loc[0][0]],
+    tooltip=f"Latitude : {lat}<br>Longitude : {lon}",
+    icon=folium.Icon(color="darkblue", icon="car", prefix="fa"),
 ).add_to(m)
 
+layer1 = folium.FeatureGroup(name="20 minutes en voiture")
+
+layer1.add_child(
+    folium.GeoJson(
+        gdf["geometry"][0],
+        style_function=lambda x: {
+            "fillColor": color[0],
+            "color": color[0],
+            "weight": 1,
+            "fillOpacity": op,
+        },
+    )
+)
+layer2 = folium.FeatureGroup(name="30 minutes en voiture")
+
+layer2.add_child(
+    folium.GeoJson(
+        gdf["geometry"][1],
+        style_function=lambda x: {
+            "fillColor": color[1],
+            "color": color[1],
+            "weight": 1,
+            "fillOpacity": op,
+        },
+    )
+)
+layer3 = folium.FeatureGroup(name="40 minutes en voiture")
+
+layer3.add_child(
+    folium.GeoJson(
+        gdf["geometry"][2],
+        style_function=lambda x: {
+            "fillColor": color[2],
+            "color": color[2],
+            "weight": 1,
+            "fillOpacity": op,
+        },
+    )
+)
+m.add_child(layer1)
+m.add_child(layer2)
+m.add_child(layer3)
 m.add_child(MeasureControl())
-url = ('https://media.licdn.com/mpr/mpr/shrinknp_100_100/AAEAAQAAAAAAAAlgAAAAJGE3OTA4YTdlLTkzZjUtNDFjYy1iZThlLWQ5OTNkYzlhNzM4OQ.jpg')
+url = "https://media.licdn.com/mpr/mpr/shrinknp_100_100/AAEAAQAAAAAAAAlgAAAAJGE3OTA4YTdlLTkzZjUtNDFjYy1iZThlLWQ5OTNkYzlhNzM4OQ.jpg"
 FloatImage(url, bottom=5, left=85).add_to(m)
-
-loc = 'Carte isochrone depuis le centre de Pontacq'
-title_html = '''
+loc = "Carte isochrone depuis le centre de Pontacq"
+title_html = """
              <h3 align="center" style="font-size:16px"><b>{}</b></h3>
-             '''.format(loc)   
+             """.format(
+    loc
+)
 m.get_root().html.add_child(folium.Element(title_html))
-folium.map.LayerControl('topright', collapsed= True).add_to(m)
-m.save(outfile= "C:/Users/Florian/Desktop/AASITE/public_html/iso.html")
+folium.map.LayerControl("topright", collapsed=True).add_to(m)
+m.save(outfile="C:/Users/Florian/Desktop/AASITE/public_html/iso.html")
 m
 </code></pre>
 <br>

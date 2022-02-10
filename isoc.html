@@ -118,81 +118,60 @@ def iso(ville):
     x = coord[0]
     y = coord[1]
     loc = [[y, x]]
-    body = {"locations": loc, "range": [2400,1800,1200]}
+    dist = [1200,1800,2400]
+    dist = sorted(dist)
+    body = {"locations": loc, "range": dist}
+    lat = round(x, 3)
+    lon = round(y, 3)
+    
     headers = {
     'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
     'Authorization': '5b3ce3597851110001cf6248df22650771d94c06a73d6fb78ba4706b',
     'Content-Type': 'application/json; charset=utf-8'}
-    call = requests.post(
-    "https://api.openrouteservice.org/v2/isochrones/driving-car",
-    json=body,
-    headers=headers,)
+    
+    call = requests.post("https://api.openrouteservice.org/v2/isochrones/driving-car",json=body,headers=headers,)
     call = call.json()
+    
     tiles = "https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png"
     attr = 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     m = folium.Map(location=[loc[0][-1], loc[0][0]],height="90%", zoom_start=10,control_scale=True,tiles=None)
     folium.TileLayer(tiles, control=False,attr=attr).add_to(m)
-
-    with open("data.json", "w") as f:
-        json.dump(call, f)
-        
-    lat = round(loc[0][-1], 2)
-    lon = round(loc[0][0], 2)
-    gdf = gpd.read_file("data.json")
+    
+    gdf = gpd.GeoDataFrame.from_features(call["features"])
     gdf["geometry"][1] = gdf["geometry"][1].difference(gdf["geometry"][0])
     gdf["geometry"][2] = gdf["geometry"][2].difference(gdf["geometry"][0])
     gdf["geometry"][2] = gdf["geometry"][2].difference(gdf["geometry"][1])
-    color = ["LimeGreen", "#FDFF4B", "#FF4B4B"]
-    op = 0.8
+    
+    color = ["YellowGreen", "#FDFF4B", "#FF4B4B"]
+    op = 0.7
 
     folium.Marker(
         location=[loc[0][-1], loc[0][0]],
         tooltip=f"Latitude : {lat}<br>Longitude : {lon}",
         icon=folium.Icon(color="lightgray", icon="flag", prefix="fa"),
     ).add_to(m)
-
-    layer1 = folium.FeatureGroup(name="20 minutes en voiture")
-
-    layer1.add_child(
-        folium.GeoJson(
-            gdf["geometry"][0],
-            style_function=lambda x: {
-                "fillColor": color[0],
-                "color": color[0],
-                "weight": 1,
-                "fillOpacity": op,
-            },
+    
+    lay = []
+    for i in range(len(dist)):
+        lay.append(folium.FeatureGroup(name=f"{int(dist[i]/60)} minutes en voiture"))
+        
+    for i in range(len(dist)):
+        lay[i].add_child(
+            folium.GeoJson(
+                gdf["geometry"][i],
+                style_function=lambda x, fillColor=color[i], color=color[i], fillOpacity=op, weight=0: {
+                    "fillColor": color,
+                    "color": color,
+                    "fillOpacity": op,
+                    "weight": weight,
+                },
+            )
         )
-    )
-    layer2 = folium.FeatureGroup(name="30 minutes en voiture")
 
-    layer2.add_child(
-        folium.GeoJson(
-            gdf["geometry"][1],
-            style_function=lambda x: {
-                "fillColor": color[1],
-                "color": color[1],
-                "weight": 1,
-                "fillOpacity": op,
-            },
-        )
-    )
-    layer3 = folium.FeatureGroup(name="40 minutes en voiture")
-
-    layer3.add_child(
-        folium.GeoJson(
-            gdf["geometry"][2],
-            style_function=lambda x: {
-                "fillColor": color[2],
-                "color": color[2],
-                "weight": 1,
-                "fillOpacity": op,
-            },
-        )
-    )
-    m.add_child(layer1)
-    m.add_child(layer2)
-    m.add_child(layer3)
+    
+    for i in lay:
+        m.add_child(i)
+        
     m.add_child(MeasureControl())
     url = "https://media.licdn.com/mpr/mpr/shrinknp_100_100/AAEAAQAAAAAAAAlgAAAAJGE3OTA4YTdlLTkzZjUtNDFjYy1iZThlLWQ5OTNkYzlhNzM4OQ.jpg"
     FloatImage(url, bottom=5, left=85).add_to(m)

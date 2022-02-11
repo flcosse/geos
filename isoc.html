@@ -16,17 +16,16 @@
 <link href="assets/css/mediumish.css" rel="stylesheet">
 </head>
 <body>
-	<link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.5.0/themes/prism.min.css"
-    />
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/styles/default.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
     </head>
     
     
     <body>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/prism.min.js"></script>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/components/prism-python.min.js"></script>
+
 	
 		
 	</body>
@@ -94,14 +93,14 @@
 			</div>
 
 			<!-- Begin Featured Image -->
-			<iframe src="iso.html"scrolling="no"frameBorder="0" height="82%" width="170%" title="" style="margin-left: -34%"></iframe>
+			<iframe src="iso.html"scrolling="no"frameBorder="0" height="90%" width="170%" title="" style="margin-left: -34%"></iframe>
 			<!-- End Featured Image -->
      
 			<!-- End Featured Image -->
 
 			<!-- Begin Post Content -->
 			<div class="article-post">
-				<pre><code class="language-python" style="font-size: 85%;">import requests
+				<pre><code class="python" style="font-size: 85%;">import requests
 import folium
 import json
 import geopandas as gpd
@@ -118,8 +117,8 @@ def iso(ville):
     x = coord[0]
     y = coord[1]
     loc = [[y, x]]
-    dist = [1200,1800,2400,3000]
-    dist = sorted(dist)
+    dist = [600,1200,1800,2400,3000]
+    dist = sorted(dist,reverse=True)
     body = {"locations": loc, "range": dist}
     lat = round(x, 3)
     lon = round(y, 3)
@@ -138,11 +137,8 @@ def iso(ville):
     folium.TileLayer(tiles, control=False,attr=attr).add_to(m)
     
     gdf = gpd.GeoDataFrame.from_features(call["features"])
-    gdf["geometry"][3] = gdf["geometry"][3].difference(gdf["geometry"][2])
-    gdf["geometry"][2] = gdf["geometry"][2].difference(gdf["geometry"][1])
-    gdf["geometry"][1] = gdf["geometry"][1].difference(gdf["geometry"][0])
-    
-    color = ["YellowGreen", "#FDFF4B", "#FFBD4C","#FF4B4B"]
+    gdf =  gdf[::-1].reset_index()
+    color = [ "#FF4B4B", "#FFBD4C","#FDFF4B","YellowGreen","#53B353"]
     op = .8
 
     folium.Marker(
@@ -154,7 +150,7 @@ def iso(ville):
     lay = []
     for i in range(len(dist)):
         lay.append(folium.FeatureGroup(name=f"{int(dist[i]/60)} minutes en voiture"))
-        
+         
     for i in range(len(dist)):
         lay[i].add_child(
             folium.GeoJson(
@@ -181,6 +177,10 @@ def iso(ville):
                  """.format(
         loc
     )
+    lay = lay[::-1]
+    for i in range((len(dist)-1),0 - 1, -1):
+        m.keep_in_front(lay[i])
+        
     m.get_root().html.add_child(folium.Element(title_html))
     folium.map.LayerControl("topright", collapsed=True).add_to(m)
     m.save(outfile="C:/Users/Florian/Desktop/AASITE/public_html/iso.html")

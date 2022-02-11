@@ -16,19 +16,11 @@
 <link href="assets/css/mediumish.css" rel="stylesheet">
 </head>
 <body>
-	<link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.5.0/themes/prism.min.css"
-    />
-    </head>
-    
-    
-    <body>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/prism.min.js"></script>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/components/prism-python.min.js"></script>
-	
-		
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/styles/default.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
 	</body>
 <!-- Begin Nav
 ================================================== -->
@@ -96,7 +88,7 @@
 			<iframe src="met.html" scrolling="no"frameBorder="0" height="800" width="1200" title="Iframe Example"style="margin-left:-21%"></iframe>
 			<!-- End Featured Image -->
 			<!-- Begin Post Content -->
-			<pre><code class="language-python">import pandas as pd
+			<pre><code class="python">import pandas as pd
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 import statistics as st

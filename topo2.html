@@ -16,18 +16,10 @@
 <link href="assets/css/mediumish.css" rel="stylesheet">
 </head>
 <body>
-	<link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.5.0/themes/prism.min.css"
-    />
-    </head>
-    
-    
-    <body>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/prism.min.js"></script>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.17.1/components/prism-python.min.js"></script>
-	
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/styles/default.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
 		
 	</body>
 <style>
@@ -101,7 +93,7 @@
 
 			<!-- Begin Post Content -->
 			<div class="article-post">
-                    <pre><code class="language-python" style="font-size: 85%;">import plotly.graph_objects as go
+                    <pre><code class="python" style="font-size: 85%;">import plotly.graph_objects as go
 import uuid
 import numpy as np
 

@@ -138,8 +138,8 @@ def iso(ville):
     
     gdf = gpd.GeoDataFrame.from_features(call["features"])
     gdf =  gdf[::-1].reset_index()
-    color = [ "#FF4B4B", "#FFBD4C","#FDFF4B","YellowGreen","#53B353"]
-    op = .8
+    color = [ "#FE0101", "#FEBB01","#FEED01","YellowGreen","#53B353"]
+    op = .6
 
     folium.Marker(
         location=[loc[0][-1], loc[0][0]],
@@ -155,7 +155,8 @@ def iso(ville):
         lay[i].add_child(
             folium.GeoJson(
                 gdf["geometry"][i],
-                style_function=lambda x, fillColor=color[i], color=color[i], fillOpacity=op, weight=0: {
+                tooltip=f"{int(dist[i]/60)} minutes",
+                style_function=lambda x, fillColor=color[i], color=color[i], fillOpacity=op, weight=1: {
                     "fillColor": color,
                     "color": color,
                     "fillOpacity": op,

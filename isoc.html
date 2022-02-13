@@ -157,6 +157,7 @@ def iso(ville):
         lay[i].add_child(
             folium.GeoJson(
                 gdf["geometry"][i],
+                tooltip=f"{int(dist[i]/60)}",
                 style_function=lambda x, fillColor=color[i], color=color[i], fillOpacity=op, weight=2: {
                     "fillColor": color,
                     "color": color,
@@ -181,7 +182,7 @@ def iso(ville):
         m.keep_in_front(lay[i])
         
     colormap = cm.LinearColormap(colors=color,vmin=min(dist)/60,vmax=max(dist)/60)
-    colormap.caption = 'Isochrone des déplacements en voiture'
+    colormap.caption = 'Isochrone des déplacements en voiture, données en minutes.'
     colormap.add_to(m)
     m.add_child(MeasureControl())
     m.get_root().html.add_child(folium.Element(title_html))

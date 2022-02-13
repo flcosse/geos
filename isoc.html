@@ -88,7 +88,7 @@
 				
 				<!-- End Top Menta -->
 
-				<h1 class="posttitle">Cartographie isochrone avec API</h1>
+				<h1 class="posttitle">Cartographie isochrone avec Folium et l'api openrouteserivce</h1>
 				
 			</div>
 
@@ -102,7 +102,6 @@
 			<div class="article-post">
 				<pre><code class="python" style="font-size: 85%;">import requests
 import folium
-import json
 import geopandas as gpd
 from folium.plugins import MeasureControl
 from folium.plugins import FloatImage
@@ -115,14 +114,13 @@ def iso(ville):
     location = geolocator.geocode(nom)
     text = [i for i in location]
     coord = text[-1]
-    x = coord[0]
-    y = coord[1]
-    loc = [[y, x]]
-    dist = [600,1200,1800,2400,3000]
+    loc = [[coord[1], coord[0]]]
+    temp = [10,20,30,40,50]
+    dist = [i*60 for i in temp]
     dist = sorted(dist)
     body = {"locations": loc, "range": dist}
-    lat = round(x, 3)
-    lon = round(y, 3)
+    lat = round(coord[1], 3)
+    lon = round(coord[0], 3)
     
     headers = {
     'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
@@ -132,9 +130,9 @@ def iso(ville):
     call = requests.post("https://api.openrouteservice.org/v2/isochrones/driving-car",json=body,headers=headers)
     call = call.json()
     
-    tiles = "https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png"
-    attr = 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    m = folium.Map(location=[loc[0][-1], loc[0][0]],height="90%", zoom_start=10,control_scale=True,tiles=None)
+    tiles = "https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.png"
+    attr = '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+    m = folium.Map(location=[loc[0][-1], loc[0][0]],height="90%",control_scale=True,tiles=None)
     folium.TileLayer(tiles, control=False,attr=attr).add_to(m)
     
     gdf = gpd.GeoDataFrame.from_features(call["features"])
@@ -143,11 +141,11 @@ def iso(ville):
         gdf["geometry"][i] = gdf["geometry"][i].difference(gdf["geometry"][j])
     
     color = ["#56A639", "#99BF01", "#F3C301","#FA8E01","#FE3131"]
-    op = .8
+    op = .3
 
     folium.Marker(
         location=[loc[0][-1], loc[0][0]],
-        tooltip=f"Latitude : {lat}<br>Longitude : {lon}",
+        tooltip=f"Départ<br>Latitude : {lat}<br>Longitude : {lon}",
         icon=folium.Icon(color="lightgray", icon="flag", prefix="fa")
     ).add_to(m)
     
@@ -180,13 +178,15 @@ def iso(ville):
     
     for i in range((len(dist)-1),0 - 1, -1):
         m.keep_in_front(lay[i])
-        
-    colormap = cm.LinearColormap(colors=color,vmin=min(dist)/60,vmax=max(dist)/60)
+    test = [i/60 for i in dist]
+    colormap = cm.LinearColormap(colors=color,vmin=min(dist)/60,vmax=max(dist)/60,index=test)
     colormap.caption = 'Isochrone des déplacements en voiture, données en minutes.'
     colormap.add_to(m)
     m.add_child(MeasureControl())
     m.get_root().html.add_child(folium.Element(title_html))
-    
+    sw = [gdf.total_bounds[1],gdf.total_bounds[0]]
+    ne = [gdf.total_bounds[-1],gdf.total_bounds[2]]
+    m.fit_bounds([sw, ne]) 
     m.save(outfile="C:/Users/Florian/Desktop/AASITE/public_html/iso.html")
     return m
 

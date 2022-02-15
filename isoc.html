@@ -122,16 +122,11 @@ def iso(ville):
     body = {"locations": loc, "range": dist}
 
     headers = {
-        "Accept": "application/json, application/geo json, application/gpx xml, img/png; charset=utf-8",
-        "Authorization": "5b3ce3597851110001cf6248df22650771d94c06a73d6fb78ba4706b",
-        "Content-Type": "application/json; charset=utf-8",
+    'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
+    'Authorization': '5b3ce3597851110001cf6248df22650771d94c06a73d6fb78ba4706b',
+    'Content-Type': 'application/json; charset=utf-8'
     }
-
-    call = requests.post(
-        "https://api.openrouteservice.org/v2/isochrones/driving-car",
-        json=body,
-        headers=headers,
-    )
+    call = requests.post('https://api.openrouteservice.org/v2/isochrones/driving-car', json=body, headers=headers)
     call = call.json()
     attr = '&copy; <a href="https://www.maptiler.com/copyright//">MapTiler</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'	
     tiles = (
@@ -182,11 +177,9 @@ def iso(ville):
     url = "https://media.licdn.com/mpr/mpr/shrinknp_100_100/AAEAAQAAAAAAAAlgAAAAJGE3OTA4YTdlLTkzZjUtNDFjYy1iZThlLWQ5OTNkYzlhNzM4OQ.jpg"
     FloatImage(url, bottom=5, left=85).add_to(m)
     loc = f"Isochrone de {nom}"
-    title_html = """
-                 <h3 align="center" style="font-size:22px"><b>{}</b></h3>
-                 """.format(
-        loc
-    )
+    title_html = f"""
+                 <h3 align="center" style="font-size:22px"><b>{loc}</b></h3>
+                 """
 
     for i in range((len(dist) - 1), 0 - 1, -1):
         m.keep_in_front(lay[i])

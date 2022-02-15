@@ -75,9 +75,7 @@ section {
 		padding-left:.7rem;
 	}
 }
-.card-columns .card {
-	margin-bottom:20px;
-}
+
 .listfeaturedtag .wrapthumbnail {
 	height:258px;
 
@@ -85,7 +83,6 @@ section {
 }
 .listfeaturedtag .card {
 	border:1px solid rgba(0,0,0,.1);
-	border-radius:2px;
 	height:260px;
 	padding-left:0;
 	margin-bottom:15px;
@@ -100,6 +97,7 @@ section {
 }
 .listfeaturedtag .card-block {
 	padding-left:0;
+	
 }
 .listfeaturedtag h2.card-title,.listrecent h2.card-title {
 	font-size:1.3rem;
@@ -347,7 +345,8 @@ blockquote {
 	border:0;
 }
 .card {
-	border-radius:4px;
+	border-radius: 4px;
+	filter: drop-shadow(0 0 0.5px rgb(107, 107, 107));
 }
 .card .img-thumb {
 	border-top-right-radius:4px;
@@ -365,7 +364,6 @@ ul.tags li {
 ul.tags li a {
 	background:rgba(0,0,0,.05);
 	color:rgba(0,0,0,.6);
-	border-radius:3px;
 	padding:5px 10px;
 }
 ul.tags li a:hover {

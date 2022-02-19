@@ -6,7 +6,7 @@
 <meta name="description" content="">
 <meta name="auteur" content="">
 <link rel="icon" href="imagr/planet-earth.png">
-<title>Tracé 3D</title>
+<title>A propos</title>
 <!-- Bootstrap core CSS -->
 <link href="assets/css/bootstrap.min.css" rel="stylesheet">
 <!-- Fonts -->
@@ -20,11 +20,9 @@
     href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/styles/default.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/highlight.min.js"></script>
 <script>hljs.initHighlightingOnLoad();</script>
+	
 		
 	</body>
-<style>
-	
-</style>
 <!-- Begin Nav
 ================================================== -->
 <nav class="navbar navbar-toggleable-md navbar-light bg-white fixed-top mediumnavigation">
@@ -44,9 +42,8 @@
             </a>
 		<ul class="navbar-nav ml-auto">
 			<li class="nav-item active">
-			<a class="nav-link" href="propos.html">A propos <span class="sr-only">(current)</span></a>
+			<a class="nav-link" href="index.html">A propos <span class="sr-only">(current)</span></a>
 			</li>
-			
 			
 		</ul>
 		<!-- End Menu -->
@@ -69,7 +66,9 @@
 
 		<!-- Begin Fixed Left Share -->
 		<div class="col-md-2 col-xs-12">
-			
+			<div class="share">
+				
+			</div>
 		</div>
 		<!-- End Fixed Left Share -->
 
@@ -81,107 +80,21 @@
 				
 				<!-- End Top Menta -->
 
-				<h1 class="posttitle">Tracé 3D avec PyQGIS et Plotly</h1>
-				<div class="after-post-tags">
-					<ul class="tags">
-						<li><a href="#">Python</a></li>
-						<li><a href="#">PyQGIS</a></li>
-						<li><a href="#">Plotly</a></li>
-						<li><a href="#">MNT</a></li>
-						<li><a href="#">3D</a></li>
-
-					</ul>
-				</div>
-	
-				<!-- Begin Featured Image -->
-				<p>
-					Holy grail funding non-disclosure agreement advisor ramen bootstrapping ecosystem. Beta crowdfunding iteration assets business plan paradigm shift stealth mass market seed money rockstar niche market marketing buzz market.
-				</p>
+				<h1 class="posttitle">test1</h1>
+				
 			</div>
+           
 
 			<!-- Begin Featured Image -->
-			<iframe src="profil2.html"scrolling="no"frameBorder="0" height="90%" width="150%" title="" style="margin-left: -23%"></iframe>
-			<!-- End Featured Image -->
-     
-			<!-- End Featured Image -->
+            <p>
+                Etudiant en géographie, je montre mes projets sur ce site. Les productions sont entièrement réalisées par moi-même.
+            </p>
+
+<br><br>		<!-- End Featured Image -->
 
 			<!-- Begin Post Content -->
-			<div class="article-post">
-                    <pre><code class="python" style="font-size: 85%;">import plotly.graph_objects as go
-import uuid
-import numpy as np
 
-file  = str(uuid.uuid4())
-fleuve = "'La Loire'"
-sub = "NomEntiteH ILIKE "+fleuve+" and Classe = 1"
-path = f"C:/Users/Florian/Desktop/département/CoursEau_FXX.shp|subset={sub}"
-iface.addVectorLayer(path,"","ogr")
-line = QgsVectorLayer(path,"","ogr")
-d = QgsDistanceArea()
-d.setEllipsoid('WGS84')
-
-for feat in line.getFeatures():
-    dist_point = (d.convertAreaMeasurement(d.measureLength(feat.geometry()),100))
-uri = f"C:/Users/Florian/Desktop/département/Relevés.shp"
-processing.run("native:pointsalonglines", 
-{'INPUT':path,
-'DISTANCE':dist_point/30000000,
-'START_OFFSET':0,
-'END_OFFSET':0,
-'OUTPUT':uri})
-
-iface.addVectorLayer(uri,"","ogr")
-iface.addRasterLayer("C:/Users/Florian/Downloads/FRADEM.TIF","Raster","gdal")
-listLayers=QgsProject.instance().mapLayersByName('Relevés')
-
-layerCrs = QgsCoordinateReferenceSystem.fromEpsgId(4326)
-listLayers[0].setCrs(layerCrs)
-
-uri = f"C:/Users/Florian/Desktop/département/BIN/{file}.shp"
-
-processing.run("native:rastersampling", 
-{'INPUT':'C:/Users/Florian/Desktop/département/Relevés.shp',
-'RASTERCOPY':'C:/Users/Florian/Downloads/FRADEM.TIF',
-'COLUMN_PREFIX':'SAMPLE_',
-'OUTPUT':uri})
-
-iface.addVectorLayer(uri,"","ogr")
-
-x = []
-y = []
-layer = QgsVectorLayer(uri,"points","ogr")
-
-for i in layer.getFeatures():
-    geom = i.geometry()
-    x.append(geom.asPoint().x())
-    y.append(geom.asPoint().y())
-
-z_ = [f["SAMPLE_1"] for f in layer.getFeatures()]
-z = [i if type(i) == float else 0 for i in z_]
-names = [layer.name() for layer in QgsProject.instance().mapLayers().values()]
-fleuve = fleuve.replace("'", "")
-
-fig = go.Figure(
-    data=go.Scatter3d(
-        x=x,
-        y=y,
-        z=z,
-        marker=dict(
-            size=0.01,
-            color=z,
-            colorscale="BrBG_r",
-        ),
-        line=dict(color="royalblue", width=8),
-    )
-)
-
-fig.update_layout(title=f"Tracé 3D : {fleuve}.<br>SCR : WGS 84")
-fig.write_html(f"C:/Users/Florian/Desktop/AASITE/public_html/profil2.html")
-fig.write_image(f"C:/Users/Florian/Desktop/AASITE/public_html/imagr/profil2.svg")
-
-fig.show()</code></pre>
 <br>
-
 			<!-- End Post Content -->
 
 			<!-- Begin Tags -->

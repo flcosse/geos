@@ -40,7 +40,7 @@
 	<div class="collapse navbar-collapse" id="navbarsExampleDefault">
 		<!-- Begin Menu -->
         <a class="navbar-brand" href="index.html">
-            <img src="imagr/home.png" alt="logo">
+            <img src="imagr/planet-earth.png" alt="logo">
             </a>
 		<ul class="navbar-nav ml-auto">
             
@@ -87,11 +87,24 @@
 				<h1 class="posttitle">Webmapping et points reliés par des lignes</h1>
 					
 			</div>
+			<div class="after-post-tags">
+				<ul class="tags">
+					<li><a href="#">Python</a></li>
+					<li><a href="#">PyQGIS</a></li>
+					<li><a href="#">qgis2web</a></li>
+					<li><a href="#">Leaflet</a></li>
+				</ul>
+			</div>
+
+			<!-- Begin Featured Image -->
+            <p>
+                La carte ci-dessous montre les flux des travailleurs pontacquais dans leurs bassins d'emplois. Les données issus de l'INSEE sont traités par un graphique qui relie des points entre eux par une ligne pour générer une carte à oursin.<br>L'extension qgis2web fournit les fichiers pour créer la webmap. Quelques modifications sont faites dans le fichier .js.
+            </p>
 <style>
 	
 </style>
 			<!-- Begin Featured Image --><h5></h3>
-			<iframe src="QGIS/index.html"scrolling="no"frameBorder="0" height="80%" width="170%" title="Carte 1" style="margin-left: -35%;"></iframe>
+			<iframe src="QGIS/index.html"scrolling="no"frameBorder="0" height="70%" width="170%" title="Carte 1" style="margin-left: -35%;"></iframe><br><br>
 <pre class="line-numbers"><code class="python">uri = r"C:\Users\Florian\Pictures\TERRITOIRE\fin.shp|layername=fin"
 layer = QgsVectorLayer(uri,"points","ogr")
 point = QgsVectorLayer(r"C:\Users\Florian\Pictures\TERRITOIRE\PONTAVQ.shp|layername=PONTAVQ","","ogr")

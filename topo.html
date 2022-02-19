@@ -41,7 +41,7 @@
 	<div class="collapse navbar-collapse" id="navbarsExampleDefault">
 		<!-- Begin Menu -->
 		<a class="navbar-brand" href="index.html">
-            <img src="imagr/home.png" alt="logo">
+            <img src="imagr/planet-earth.png" alt="logo">
             </a>
 		<ul class="navbar-nav ml-auto">
 			<li class="nav-item active">
@@ -85,15 +85,28 @@
 				<h1 class="posttitle">Profil altimétrique avec PyQGIS</h1>
 				
 			</div>
+            <div class="after-post-tags">
+				<ul class="tags">
+					<li><a href="#">Python</a></li>
+					<li><a href="#">PyQGIS</a></li>
+					<li><a href="#">Plotly</a></li>
+					<li><a href="#">MNT</a></li>
+
+				</ul>
+			</div>
 
 			<!-- Begin Featured Image -->
-			<iframe src="profil.html"scrolling="no"frameBorder="0" height="70%" width="175%" title="" style="margin-left: -33%"></iframe>
+            <p>
+                Un MNT (Modèle Numérique de Terrain) est importé. Une ligne est tracée à partir de coordonnées, ainsi qu'une jointure pour le titre. Une série de points sont placés le long de cette ligne et ils serviront à récupérer les données d'altitudes depuis le MNT.<br>Les données sont stockées dans des listes et intègrent le graphique généré par plotly. La totalité de l'opération est faite dans la console Python de QGIS.
+            </p>
+			<iframe src="profil.html"scrolling="no"frameBorder="0" height="60%" width="175%" title="" style="margin-left: -33%"></iframe>
 			<!-- End Featured Image -->
      
 			<!-- End Featured Image -->
 
 			<!-- Begin Post Content -->
 			<div class="article-post">
+
 				<pre><code class="python" style="font-size: 85%;">from statistics  import mean
 import plotly.graph_objects as go
 import numpy as np

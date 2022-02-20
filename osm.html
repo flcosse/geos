@@ -205,7 +205,7 @@ df["Landuse"] = df["Landuse"].replace(
     [
         "Terres agricoles",
         "Militaire",
-        "Terres boisées",
+        "Forêts",
         "Pré/prairie",
         "Zones résidentielles",
         "Ferme",
@@ -244,7 +244,7 @@ color = {
     "Militaire": "peru",
     "Industriel": "red",
     "Pré/prairie": "wheat",
-    "Terres boisées": "Green",
+    "Forêts": "Green",
     "Autre": "lightgrey",
     "Zones résidentielles": "orangered",
     "Marché": "brown",
@@ -280,21 +280,35 @@ fig = px.pie(
     names="Landuse",
     color="Landuse",
     color_discrete_map=color,
+    hole=.4
 )
 
 fig.update_traces(hovertemplate='Occupation : %{label}<br>Surface : %{value}km²')
 fig.update_layout(
-    title=f"Répartition de l'occupation du sol dans la ville de {ville}",
     font=dict(
-        family="Arial",
-        size=18,
-    ),
+        family='-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif',
+        size=13,
+    )
+)
+fig.add_annotation(
+    text=f"Occupation du sol dans le ville de {ville} ",
+    yanchor="top",
+    y=1.15,
+    xanchor="center",
+    showarrow=False,
+    font=dict(size=15)
 )
 
-fig.update_layout(font_family="Arial")
+fig.update_layout(legend=dict(
+    yanchor="top",
+    y=-0.1,
+    xanchor="left",
+    x=0,
+    orientation="h"
+))
 fig.write_html(f"C:/Users/Florian/Desktop/AASITE/public_html/file.html")
-fig.write_image(f"C:/Users/Florian/Desktop/AASITE/public_html/imagr/Pontacq.svg")
-fig.show()
+fig.write_image(f"C:/Users/Florian/Desktop/AASITE/public_html/imagr/est.svg")
+
 </code></pre>
 <br>
 			<!-- End Post Content -->

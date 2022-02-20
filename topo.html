@@ -99,7 +99,7 @@
             <p>
                 Un MNT (Modèle Numérique de Terrain) est importé. Une ligne est tracée à partir de coordonnées rentrées par l'utilsateur. Une série de points sont placés le long de cette ligne et ils serviront à récupérer les données d'altitudes depuis le MNT.<br>Les données sont stockées dans des listes et intègrent le graphique généré par plotly. La totalité de l'opération est faite dans la console Python de QGIS.
             </p>
-			<iframe src="profil.html"scrolling="no"frameBorder="0" height="50%" width="175%" title="" style="margin-left: -33%"></iframe>
+			<iframe src="profil.html"scrolling="no"frameBorder="0" height="40%" width="110%" style="margin-left: -2%;" title=""></iframe>
 			<!-- End Featured Image -->
      
 			<!-- End Featured Image -->
@@ -296,26 +296,29 @@ fig.update_xaxes(showgrid=True,gridwidth=.1, gridcolor=color)
 
 fig.update_layout(legend_itemdoubleclick=False)
 fig.update(layout_yaxis_range=[mini * 0.9, maxi * 1.1])
-fig.write_image(f"C:/Users/Florian/Desktop/AASITE/public_html/imagr/profil.svg")
 
 fig.add_annotation(
     text=f"<i>Longueur : {max(x)}m / Dénivelé : {round(min(y)-max(y),1)}m / Moyenne : {moyenne}m / Pente : {pente}%</i>",
     xref="paper",
     yref="paper",
     x=0.5,
-    y=-0.15,
+    y=-0.3,
     showarrow=False,
 )
 fig.add_annotation(
     text=f"<i>Départ : {coord1[0]} / {coord1[1]} - Arrivée : {coord2[0]} / {coord2[1]} </i>",
     xref="paper",
     yref="paper",
-    x=-0.03,
-    y=1.085,
+    x=-0.065,
+    y=1.18,
     showarrow=False,
 )
-fig.update_layout(hovermode='x unified', legend=dict(title= None), hoverlabel=dict(bgcolor='rgba(255,255,255,0.75)',
-                                                                                  font=dict(color='black')))
+fig.update_layout(hovermode='x unified', legend=dict(title= None), hoverlabel=dict(bgcolor='rgba(255,255,255,0.75)',font=dict(color='black',family='-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif',size=10)))
+fig.update_layout(
+    font=dict(
+        family='-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif',
+        size=12,    )
+)
 
 fig.update_xaxes(title_text="Distance")
 fig.update_yaxes(title_text="Altitude")

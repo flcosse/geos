@@ -96,7 +96,7 @@
             </p>
 			<!-- Begin Featured Image -->
 			
-			<iframe src="met.html" scrolling="no"frameBorder="0" height="75%" width="165%" title="Iframe Example"style="margin-left:-22%"></iframe>
+			<iframe src="met.html" scrolling="no"frameBorder="0" height="70%" width="110%" title="Iframe Example"style="margin-bottom:-10%;margin-left:-5%"></iframe>
 			<!-- End Featured Image -->
 			<!-- Begin Post Content -->
 			<pre><code class="python">import pandas as pd
@@ -157,8 +157,7 @@ def figure(d, a, b, t, z, nom, co):
             marker_color=co,
             hovertemplate="<b>%{y}°C</b>",
             line=dict(width=3),
-            legendgroup="Saison",
-            legendgrouptitle_text="<b>Saisons"
+
         ),
         a,
         b,
@@ -173,9 +172,8 @@ def figure(d, a, b, t, z, nom, co):
         mode="lines",
         showlegend=t,
         hovertemplate="<b>%{y:.1f}°C</b>",
-        line=dict(color="red",width=3),
         legendgroup="Statistique",
-        legendgrouptitle_text="<b>Statistique"
+        line=dict(color="red",width=3),
     )
     fig.append_trace(reg, a, b)
     fig.update_layout(
@@ -198,12 +196,17 @@ figure(y(moyenne(liste(filtre(saison(df,3,4,5))["TAVG"]))),2,2,True,y(liste(filt
 
 fig.update_layout(title_text=f'Températures moyennes par années et par saisons<br>Station : {nom.title()}',
     autosize=False,
-    width=1100,
-    height=800)
+    width=800,
+    height=600)
+fig.update_layout(legend=dict(
+    yanchor="top",
+    y=-.1,
+    xanchor="left",
+    x=.15,
+    orientation="h"
+))
 
-fig.add_annotation(text='<a href="https://raw.githubusercontent.com/flcosse/script/main/2652017.csv">Source : Données NOAA (National Oceanic and Atmospheric Administration)</a>',
-                  xref="paper", yref="paper",
-                  x=-0.03, y=-0.1, showarrow=False)
+
 
 fig.write_html(f"C:/Users/Florian/Desktop/AASITE/public_html/met.html")
 

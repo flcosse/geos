@@ -85,7 +85,7 @@
             </div>
             <!-- Begin Featured Image -->
             <p>
-               Une série de graphiques et de cartes sont générée via Plotly. L'interactivité du site est assurée par Dash, depuis un serveur hébergé par l'application Heroku. Les données sont automatiquement traitées par Pandas.
+               Une série de graphiques et de cartes sont générée via Plotly. L'interactivité du site est assurée par Dash, l'application est hébergée sur Heroku. Les données sont automatiquement traitées par Pandas.
             </p>
             <!-- Begin Featured Image -->
             <a href="https://fcosse.herokuapp.com">
@@ -625,7 +625,7 @@ def prop(pays):
         names="Origine",
         color="Origine",
         color_discrete_map=c,
-        title="Nombre d'unités de production pager type",
+        title="Nombre d'unités de production par type",
     )
     fig.update_layout(margin={"r": 0, "l": 0, "b": 0, "t": 45})
     fig.update_traces(hovertemplate="%{label} : %{value} (%{percent})")

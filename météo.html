@@ -156,7 +156,7 @@ def figure(d, a, b, t, z, nom, co):
             name=nom,
             marker_color=co,
             hovertemplate="<b>%{y}°C</b>",
-            line=dict(width=3),
+            line=dict(width=2.5),
 
         ),
         a,
@@ -173,7 +173,7 @@ def figure(d, a, b, t, z, nom, co):
         showlegend=t,
         hovertemplate="<b>%{y:.1f}°C</b>",
         legendgroup="Statistique",
-        line=dict(color="red",width=3),
+        line=dict(color="red",width=2.5),
     )
     fig.append_trace(reg, a, b)
     fig.update_layout(
@@ -186,8 +186,12 @@ def figure(d, a, b, t, z, nom, co):
     color = f"rgb({chiffre}, {chiffre}, {chiffre})"
     fig.update_xaxes(showgrid=True, gridwidth=0.1, gridcolor=color)
     fig.update_yaxes(showgrid=True, gridwidth=0.1, gridcolor=color)
-
+    fig.update_yaxes(zeroline=True, zerolinewidth=2, zerolinecolor='lightgray')
     fig.update_layout(hovermode="x")
+    fig.update_layout(
+    font=dict(
+        family='-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif',
+        size=12,    ))
 
 figure(y(moyenne(liste(filtre(saison(df,12,1,2))["TAVG"]))),1,1,False,y(liste(filtre(saison(df,12,1,2))["TAVG"])),"Hiver","royalblue")
 figure(y(moyenne(liste(filtre(saison(df,6,7,8))["TAVG"]))),1,2,False,y(liste(filtre(saison(df,6,7,8))["TAVG"])),"Eté","#FFD700")
@@ -210,7 +214,6 @@ fig.update_layout(legend=dict(
 
 fig.write_html(f"C:/Users/Florian/Desktop/AASITE/public_html/met.html")
 
-fig.show()
 </code></pre>
 <br>
 			<!-- End Post Content -->

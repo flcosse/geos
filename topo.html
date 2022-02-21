@@ -17,10 +17,11 @@
 </head>
 <body>
     <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/styles/default.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/highlight.min.js"></script>
-<script>hljs.initHighlightingOnLoad();</script>
-	
+    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.0.3/styles/googlecode.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/languages/python.min.js"></script>
+
+    <script>hljs.initHighlightingOnLoad();</script>
 		
 	</body>
 <style>
@@ -99,11 +100,10 @@
             <p>
                 Un MNT (Modèle Numérique de Terrain) est importé. Une ligne est tracée à partir de coordonnées rentrées par l'utilsateur. Une série de points sont placés le long de cette ligne et ils serviront à récupérer les données d'altitudes depuis le MNT.<br>Les données sont stockées dans des listes et intègrent le graphique généré par plotly. La totalité de l'opération est faite dans la console Python de QGIS.
             </p>
-			<iframe src="profil.html"scrolling="no"frameBorder="0" height="40%" width="110%" style="margin-left: -2%;" title=""></iframe>
+			<iframe src="profil.html"scrolling="no"frameBorder="0" height="40%" width="110%" style="margin-left: -2%" title=""></iframe>
 			<!-- End Featured Image -->
      
 			<!-- End Featured Image -->
-
 			<!-- Begin Post Content -->
 			<div class="article-post">
 
@@ -264,9 +264,9 @@ fig = go.Figure(
             y=y,
             hovertemplate="Distance : %{x:.0f}m<br>Altitude : %{y:.0f}m<br>X : %{customdata[0]:.3f}<br>Y : %{customdata[1]:.3f}<extra></extra>",
             fill="tozeroy",
-            line_color="rgba(0, 204, 150, 1)",
+            line_color="rgba(1,224,130,255)",
             mode="lines",
-            fillcolor="rgba(0, 204, 150, 0.18)",
+            fillcolor="rgba(1,224,130,0.18)",
             hoverinfo="none")
     ],
     layout=dict(title=dict(text=f"Profil altimétrique, {nom1[0]} - {nom2[0]}")),
@@ -302,7 +302,7 @@ fig.add_annotation(
     xref="paper",
     yref="paper",
     x=0.5,
-    y=-0.3,
+    y=-0.23,
     showarrow=False,
 )
 fig.add_annotation(
@@ -310,7 +310,7 @@ fig.add_annotation(
     xref="paper",
     yref="paper",
     x=-0.065,
-    y=1.18,
+    y=1.15,
     showarrow=False,
 )
 fig.update_layout(hovermode='x unified', legend=dict(title= None), hoverlabel=dict(bgcolor='rgba(255,255,255,0.75)',font=dict(color='black',family='-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif',size=10)))
@@ -326,7 +326,6 @@ fig.update_yaxes(title_text="Altitude")
 fig.update_xaxes(showspikes=True, spikecolor="DarkGray", spikesnap="data",spikethickness=2, spikemode="toaxis+across",spikedash="dash")
 fig.update_yaxes(showspikes=True, spikecolor="DarkGray", spikesnap="data", spikethickness=2,spikemode="toaxis+across",spikedash="dash")
 fig.update_layout(spikedistance=1000, hoverdistance=100)
-
 
 fig.write_html(f"C:/Users/Florian/Desktop/AASITE/public_html/profil.html")
 </code></pre>

@@ -6,6 +6,8 @@ License: https://www.wowthemes.net/freebies-license/
 */
 body {
 	padding-top:5rem;
+	overflow-y: scroll;
+overflow-x: hidden;
 	
 }
 .mainheading {
@@ -167,6 +169,7 @@ span.post-name,span.post-date,span.author-meta {
 span.post-date,span.post-read {
 	color:rgba(0,0,0,.44);
 }
+
 span.post-read-more {
 	align-items:center;
 	display:inline-block;
@@ -178,6 +181,8 @@ pre code {
 	height: 600px;
 	width: 1200;
 	display: block;
+	
+	
 	}
 span.post-read-more a {
 	color:rgba(0,0,0,.44);

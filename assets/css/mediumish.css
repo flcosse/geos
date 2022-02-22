@@ -178,10 +178,8 @@ span.post-read-more {
 }
 
 pre code {
-	margin-left: auto;
-	margin-right: auto;
+
 	height: 70vh;
-	width:100%;
 	border-radius: 5px;
 	filter: drop-shadow(0 0 5px rgb(235, 235, 235));
 	}
@@ -388,6 +386,8 @@ blockquote {
 	border-top-left-radius:4px;
 }
 ul.tags {
+	font-weight: 700;
+	text-decoration: none;
 	list-style:none;
 	padding-left:0;
 	margin:0 0 2rem 0;
@@ -397,7 +397,7 @@ ul.tags li {
 	font-size:0.9rem;
 }
 ul.tags li a {
-	background:rgba(0,0,0,.05);
+	background:#fafafa;
 	color:rgba(0,0,0,.6);
 	padding:5px 10px;
 }

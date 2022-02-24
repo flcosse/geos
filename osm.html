@@ -273,7 +273,6 @@ for i, j in color.items():
     for k in liste:
         if i == k:
             set.append(j)
-            
 color = dict(zip(liste, set))
 fig = px.pie(
     df,
@@ -281,31 +280,31 @@ fig = px.pie(
     names="Landuse",
     color="Landuse",
     color_discrete_map=color,
-    hole=0.4,
+    hole=.4
 )
-
-fig.update_traces(hovertemplate="Occupation : %{label}Surface : %{value}km²")
+family='-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif',
+fig.update_traces(hovertemplate='Occupation : %{label}<br>Surface : %{value}km²')
 fig.update_layout(
     font=dict(
-        family="-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif",
+        family='-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif',
         size=13,
     )
 )
-fig.add_annotation(
-    text=f"Occupation du sol dans le ville de {ville} ",
+
+fig.update_layout(title_text=f"Occupation du sol dans le ville de {ville} ",title_x=0.5,title_y=0.95,font=dict(size=12,family='-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif',))
+
+fig.update_layout(legend=dict(
     yanchor="top",
-    y=1.15,
-    xanchor="center",
-    showarrow=False,
-    font=dict(size=15),
-)
-
-fig.update_layout(
-    legend=dict(yanchor="top", y=-0.1, xanchor="left", x=0, orientation="h")
-)
-fig.write_html(f"C:/Users/Florian/Desktop/AASITE/public_html/file.html")
+    y=-0.1,
+    xanchor="left",
+    x=0,
+    orientation="h"
+))
+fig.update_layout(legend_itemdoubleclick=False)
+fig.layout.xaxis.fixedrange = True
+fig.layout.yaxis.fixedrange = True
+fig.write_html(f"C:/Users/Florian/Desktop/AASITE/public_html/file.html",config={'displayModeBar': False})
 fig.write_image(f"C:/Users/Florian/Desktop/AASITE/public_html/imagr/est.svg")
-
 
 </code></pre>
 <br>

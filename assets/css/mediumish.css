@@ -182,7 +182,6 @@ pre code {
 	height: 70vh;
 	border-radius: 5px;
 	filter: drop-shadow(0 0 5px rgb(218, 218, 218));
-	font-weight: 540;
 	}
 pre code::-webkit-scrollbar {
 	width: 20px;

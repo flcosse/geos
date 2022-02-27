@@ -2,7 +2,6 @@
         #map {
             background-color: #ffffff
         }
-
         th {
             text-align: left;
             vertical-align: top;
@@ -19,7 +18,6 @@
             margin: 0 0 5px;
             color: #777;
         }
-        
         .leaflet-container {
             background: #fff;
             padding-right: 10px;
@@ -45,9 +43,11 @@
         .leaflet-touch .leaflet-control-geocoder-icon,
         .leaflet-control-search .search-button,
          .leaflet-control-measure {
+            
             background-color: #f8f8f8 !important;
             border-radius: 0px !important;
             color: #000000 !important;
+            
         }
         .abstract {
             font: bold 18px 'Lucida Console', Monaco, monospace;

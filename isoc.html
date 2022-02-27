@@ -110,7 +110,7 @@
             <p>
 La librairie Nominatim renvoie les coordonnées d'une ville. Ces coordonnées servent à alimenter la requête faite à l'api d'openrouteserivce. La réponse sous format json est ensuite utilisée pour générer une carte avec Folium.            </p>
 			<!-- Begin Featured Image -->
-			<iframe src="iso.html"scrolling="no"frameBorder="0" width="100%" height="700vh"title=""></iframe>
+			<iframe src="iso.html"scrolling="no"frameBorder="0" width="100%" height="70%"title="" style="margin-bottom: -2%;"></iframe>
 			<!-- End Featured Image -->
      
 			<!-- End Featured Image -->
@@ -124,6 +124,7 @@ from folium.plugins import MeasureControl
 from folium.plugins import FloatImage
 from geopy.geocoders import Nominatim
 import branca.colormap as cm
+from branca.element import Template, MacroElement
 
 
 def iso(ville):
@@ -133,7 +134,7 @@ def iso(ville):
     text = [i for i in location]
     coord = text[-1]
     loc = [[coord[1], coord[0]]]
-    temp = [5, 15, 25, 35, 45]
+    temp = [5, 20, 35, 45,60]
     dist = [i * 60 for i in temp]
     dist = sorted(dist)
     body = {"locations": loc, "range": dist}
@@ -145,12 +146,12 @@ def iso(ville):
     }
     call = requests.post('https://api.openrouteservice.org/v2/isochrones/driving-car', json=body, headers=headers)
     call = call.json()
-    attr = '&copy; <a href="https://www.maptiler.com/copyright//">MapTiler</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'	
+    attr = '&copy; &lt;a href="https://www.maptiler.com/copyright//"&gt;MapTiler&lt;/a&gt;,  &lt;a href="https://openrouteservice.org/"&gt;Openrouteservice&lt;/a&gt;&copy; &lt;a href="https://www.openstreetmap.org/copyright"&gt;OpenStreetMap&lt;/a&gt; contributors'	
     tiles = (
         "https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=SBvS5B6Sbe35DQBbJflS"
     )
     m = folium.Map(
-        location=[loc[0][-1], loc[0][0]], height="85%", control_scale=True, tiles=None
+        location=[loc[0][-1], loc[0][0]], height="85%", control_scale=True, tiles=None,zoom_start=9
     )
     folium.TileLayer(tiles, control=True, attr=attr, show=True).add_to(m)
     gdf = gpd.GeoDataFrame.from_features(call["features"])
@@ -163,8 +164,8 @@ def iso(ville):
 
     folium.Marker(
         location=[loc[0][-1], loc[0][0]],
-        tooltip=f"Départ<br>Latitude : {round(coord[1], 3)}<br>Longitude : {round(coord[0], 3)}",
-        icon=folium.Icon(color="black", icon="flag", prefix="fa"),
+        tooltip=f"Départ&lt;br&gt;Latitude : {round(coord[1], 3)}&lt;br&gt;Longitude : {round(coord[0], 3)}",
+        icon=folium.Icon(color="black", icon="circle", prefix="fa"),
     ).add_to(m)
 
     lay = [
@@ -191,22 +192,17 @@ def iso(ville):
     for i in lay:
         m.add_child(i)
 
-    url = "https://media.licdn.com/mpr/mpr/shrinknp_100_100/AAEAAQAAAAAAAAlgAAAAJGE3OTA4YTdlLTkzZjUtNDFjYy1iZThlLWQ5OTNkYzlhNzM4OQ.jpg"
-    FloatImage(url, bottom=5, left=85).add_to(m)
+    
     loc = f"Isochrone de {nom}"
     title_html = f"""
-                 <h3 align="center" style="font-size:22px"><b>{loc}</b></h3>
+                 &lt;h3 align="center" style="font-size:22px"&gt;&lt;b&gt;{loc}&lt;/b&gt;&lt;/h3&gt;
                  """
 
     for i in range((len(dist) - 1), 0 - 1, -1):
         m.keep_in_front(lay[i])
 
     test = [i / 60 for i in dist]
-    colormap = cm.LinearColormap(
-        colors=color, vmin=min(dist) / 60, vmax=max(dist) / 60, index=test
-    )
-    colormap.caption = "Isochrone des déplacements en voiture, données en minutes."
-    colormap.add_to(m)
+
     m.add_child(MeasureControl())
     m.get_root().html.add_child(folium.Element(title_html))
     m.fit_bounds(
@@ -217,11 +213,90 @@ def iso(ville):
             gdf.total_bounds[2],
         ]
     )
+    template = """
+{% macro html(this, kwargs) %}
+
+  &lt;link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"&gt;
+
+  &lt;script src="https://code.jquery.com/jquery-1.12.4.js"&gt;&lt;/script&gt;
+  &lt;script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"&gt;&lt;/script&gt;
+  
+
+&lt;/head&gt;
+&lt;body&gt;
+
+ 
+&lt;div id='maplegend' class='maplegend' 
+    style='filter: drop-shadow(0 0 5px rgb(218, 218, 218));position: absolute;margin-bottom:10%; z-index:999; background-color:rgba(255, 255, 255, 0.8);
+     border-radius:0px; padding: 10px; font-size:14px; right: 20px; bottom: 20px;'&gt;
+     
+&lt;div class='legend-title'&gt;Déplacements en&lt;br&gt;voiture (minutes)&lt;/div&gt;
+&lt;div class='legend-scale'&gt;
+  &lt;ul class='legend-labels'&gt;
+    &lt;li&gt;&lt;span style='background:seagreen;opacity:0.6;'&gt;&lt;/span&gt;10&lt;/li&gt;
+    &lt;li&gt;&lt;span style='background:yellowgreen;opacity:0.6;'&gt;&lt;/span&gt;15&lt;/li&gt;
+    &lt;li&gt;&lt;span style='background:gold;opacity:0.6;'&gt;&lt;/span&gt;25&lt;/li&gt;
+    &lt;li&gt;&lt;span style='background:darkorange;opacity:0.6;'&gt;&lt;/span&gt;40&lt;/li&gt;
+    &lt;li&gt;&lt;span style='background:red;opacity:0.6;'&gt;&lt;/span&gt;60&lt;/li&gt;
+    
+
+  &lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+ 
+&lt;/body&gt;
+&lt;/html&gt;
+
+&lt;style type='text/css'&gt;
+  .maplegend .legend-title {
+    text-align: left;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 90%;
+    }
+  .maplegend .legend-scale ul {
+    margin: 0;
+    margin-bottom: 5px;
+    padding: 0;
+    float: left;
+    list-style: none;
+    }
+  .maplegend .legend-scale ul li {
+    font-size: 80%;
+    list-style: none;
+    margin-left: 0;
+    line-height: 18px;
+    margin-bottom: 2px;
+    }
+  .maplegend ul.legend-labels li span {
+    display: block;
+    float: left;
+    height: 16px;
+    width: 30px;
+    margin-right: 5px;
+    margin-left: 0;
+    }
+  .maplegend .legend-source {
+    font-size: 80%;
+    color: #777;
+    clear: both;
+    }
+  .maplegend a {
+    color: #777;
+    }
+&lt;/style&gt;
+{% endmacro %}"""
+
+    macro = MacroElement()
+    macro._template = Template(template)
+
+    m.get_root().add_child(macro)
     m.save(outfile="C:/Users/Florian/Desktop/AASITE/public_html/iso.html")
     return m
 
 
-iso("Tarbes")
+iso("Bordeaux")
+
 </code></pre>
 <br>
 

@@ -4850,7 +4850,6 @@ tbody.collapse.show {
 	-ms-flex-direction: column;
 	flex-direction: column;
 	background-color: #fff;
-	border: 1px solid rgba(0, 0, 0, .125);
 	border-radius: 0px;
 	
 }

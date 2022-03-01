@@ -368,18 +368,21 @@ blockquote {
 	position:relative;
 }
 .listrelated .card {
-	box-shadow:0 1px 7px rgba(0,0,0,.05);
+	box-shadow:0 0 7px rgba(0,0,0,.05);
 	border:0;
 }
 .card {
-	border-radius: 4px;
+	filter: drop-shadow(0 0 10px rgb(241, 241, 241));
+	margin-top: 5%;
 }
 .card:hover{
 	margin-top: 1px;
-	filter: drop-shadow(0 0 5px rgb(223, 223, 223));
-	-webkit-transform: scale(.95, .95);
-	transform: scale(.95,.95);
-	transition: transform .1s;
+	filter: drop-shadow(0 0 7px rgb(219, 219, 219));
+	-webkit-transform: scale(.97, .97);
+	transform: scale(.97,.97);
+	transition: transform .2s;
+	margin-top: 5%;
+
 }
 .card .img-thumb {
 	border-top-right-radius:4px;

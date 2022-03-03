@@ -374,6 +374,7 @@ blockquote {
 .card {
 	filter: drop-shadow(0 0 10px rgb(241, 241, 241));
 	margin-top: 5%;
+	border-radius: 3%;
 }
 .card:hover{
 	margin-top: 1px;

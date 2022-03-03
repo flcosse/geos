@@ -133,8 +133,8 @@ def point(nom,x,y,lien):
 
 nom1 = "Point1"
 nom2= "Point2"
-coord1 = [-0.09770,43.19178]
-coord2 = [-0.3481,43.3170]
+coord1 = [-0.50907,43.33633]
+coord2 = [-0.22569,43.34951]
 
 
 point(nom1,coord1[0],coord1[1],f"C:/Users/Florian/Desktop/département/{nom1}.shp")
@@ -277,11 +277,11 @@ moyenne = round(moyenne, 1)
 maxi = int(round(float(max(y))))
 mini = int(round(float(min(y))))
 
-pente = round(((min(y) -max(y)) / max(x)) * 100, 1)
+pente = round(((y[-1] -y[0]) / max(x)) * 100, 1)
 fig.update_layout(
         {
-            "plot_bgcolor": "white",
-            "paper_bgcolor": "white",
+            "plot_bgcolor": "#fcfcfc",
+            "paper_bgcolor": "#fcfcfc",
         }
     )
 
@@ -293,7 +293,7 @@ fig.update_yaxes(showgrid=True, gridwidth=.1,gridcolor=color)
 fig.update_xaxes(showgrid=True,gridwidth=.1, gridcolor=color)
 
 fig.update_layout(legend_itemdoubleclick=False)
-fig.update(layout_yaxis_range=[mini * 0.9, maxi * 1.1])
+fig.update(layout_yaxis_range=[0, maxi * 1.5])
 
 fig.update_layout(hovermode='x unified', legend=dict(title= None), hoverlabel=dict(bgcolor='rgba(255,255,255,0.8)',font=dict(color='black',family='-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif',size=10)))
 fig.update_layout(
@@ -305,7 +305,7 @@ fig.update_layout(title_text=f"<i>Profil altimétrique, {nom1[0]} - {nom2[0]}<br
 title_x=0,title_y=0.9,font=dict(size=11,
 family='-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif',))
 
-fig.update_layout(xaxis_title=f"Distance<br><i>Longueur : {max(x)}m / Dénivelé : {round(min(y)-max(y),1)}m / Moyenne : {moyenne}m / Pente : {pente}%</i>",font=dict(size=11,
+fig.update_layout(xaxis_title=f"Distance<br><i>Longueur : {max(x)}m / Dénivelé : {round(y[-1] -y[0],1)}m / Moyenne : {moyenne}m / Pente : {pente}%</i>",font=dict(size=11,
 family='-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif',))
 fig.update_yaxes(title_text="Altitude")
 fig.update_layout(margin={"r": 0, "l": 0})

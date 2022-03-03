@@ -372,13 +372,13 @@ blockquote {
 	border:0;
 }
 .card {
-	filter: drop-shadow(0 0 10px rgb(241, 241, 241));
+	filter: drop-shadow(0 0 10px rgb(220, 220, 220));
 	margin-top: 5%;
 	border-radius: 3%;
 }
 .card:hover{
 	margin-top: 1px;
-	filter: drop-shadow(0 0 7px rgb(219, 219, 219));
+	filter: drop-shadow(0 0 10px rgb(200, 200, 200));
 	-webkit-transform: scale(.97, .97);
 	transform: scale(.97,.97);
 	transition: transform .2s;

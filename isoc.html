@@ -93,7 +93,7 @@
 				
 				<!-- End Top Menta -->
 
-				<h1 class="posttitle">Isochrone avec l'api openrouteserivce et Folium </h1>
+				<h1 class="posttitle">Isochrone avec l'api openrouteserivce et Plotly </h1>
 			</div>
             <div class="after-post-tags">
 				<ul class="tags">
@@ -101,16 +101,15 @@
 					<li><a href="#">Geocodage</a></li>
 					<li><a href="#">API</a></li>
 					<li><a href="#">Geopandas</a></li>
-                    <li><a href="#">Folium</a></li>
 
 				</ul>
 			</div>
 
 			<!-- Begin Featured Image -->
             <p>
-La librairie Nominatim renvoie les coordonnées d'une ville. Ces coordonnées servent à alimenter la requête faite à l'api d'openrouteserivce. La réponse sous format json est ensuite utilisée pour générer une carte avec Folium.            </p>
+La librairie Nominatim renvoie les coordonnées d'une ville. Ces coordonnées servent à alimenter la requête faite à l'api d'openrouteserivce. La réponse sous format json est ensuite utilisée pour générer une carte avec Plotly.            </p>
 			<!-- Begin Featured Image -->
-			<iframe src="iso.html"scrolling="no"frameBorder="0" width="100%" height="65%"title=""></iframe>
+			<iframe src="iso.html"scrolling="no"frameBorder="0" width="100%" height="70%"title=""></iframe>
 			<!-- End Featured Image -->
      
 			<!-- End Featured Image -->
@@ -118,14 +117,10 @@ La librairie Nominatim renvoie les coordonnées d'une ville. Ces coordonnées se
 			<!-- Begin Post Content -->
                 
 				<pre><code class="python">import requests
-import folium
 import geopandas as gpd
-from folium.plugins import MeasureControl
-from folium.plugins import FloatImage
 from geopy.geocoders import Nominatim
-import branca.colormap as cm
-from branca.element import Template, MacroElement
-
+import plotly.graph_objects as go
+import json
 
 def iso(ville):
     nom = ville
@@ -134,11 +129,11 @@ def iso(ville):
     text = [i for i in location]
     coord = text[-1]
     loc = [[coord[1], coord[0]]]
-    temp = [5, 20, 35, 45,60]
+    temp = [10, 20, 30, 40, 50]
     dist = [i * 60 for i in temp]
     dist = sorted(dist)
     body = {"locations": loc, "range": dist}
-
+    family = '-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif'
     headers = {
     'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
     'Authorization': '5b3ce3597851110001cf6248df22650771d94c06a73d6fb78ba4706b',
@@ -146,157 +141,111 @@ def iso(ville):
     }
     call = requests.post('https://api.openrouteservice.org/v2/isochrones/driving-car', json=body, headers=headers)
     call = call.json()
-    attr = '&copy; &lt;a href="https://www.maptiler.com/copyright//"&gt;MapTiler&lt;/a&gt;,  &lt;a href="https://openrouteservice.org/"&gt;Openrouteservice&lt;/a&gt;&copy; &lt;a href="https://www.openstreetmap.org/copyright"&gt;OpenStreetMap&lt;/a&gt; contributors'	
-    tiles = (
-        "https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=SBvS5B6Sbe35DQBbJflS"
-    )
-    m = folium.Map(
-        location=[loc[0][-1], loc[0][0]], height="85%", control_scale=True, tiles=None,zoom_start=9
-    )
-    folium.TileLayer(tiles, control=True, attr=attr, show=True).add_to(m)
     gdf = gpd.GeoDataFrame.from_features(call["features"])
 
     for i, j in zip(range((len(dist) - 1), -1, -1), range((len(dist) - 2), -1, -1)):
         gdf["geometry"][i] = gdf["geometry"][i].difference(gdf["geometry"][j])
-
-    color = ["SeaGreen", "YellowGreen", "gold", "darkorange", "red"]
-    op = 0.5
-
-    folium.Marker(
-        location=[loc[0][-1], loc[0][0]],
-        tooltip=f"Départ&lt;br&gt;Latitude : {round(coord[1], 3)}&lt;br&gt;Longitude : {round(coord[0], 3)}",
-        icon=folium.Icon(color="black", icon="circle", prefix="fa"),
-    ).add_to(m)
-
-    lay = [
-        folium.FeatureGroup(name=f"{int(dist[i]/60)} minutes en voiture")
-        for i in range(len(dist))
+    kek = gdf.to_json()
+    kek = json.loads(kek)
+    gdf["min"] = [i / 60 for i in gdf["value"]]
+    tok = open(".mapbox_token.txt").read()
+    color = [
+        "rgb(24, 78, 119)",
+        "rgb(26, 117, 159)",
+        "rgb(52, 160, 164)",
+        "rgb(109, 196, 149)",
+        "rgb(169, 222, 142)",
     ]
-
-    for i in range(len(dist)):
-        lay[i].add_child(
-            folium.GeoJson(
-                gdf["geometry"][i],
-                tooltip=f"{int(dist[i]/60)}",
-                style_function=lambda x, fillColor=color[i], color=color[
-                    i
-                ], fillOpacity=op, weight=1: {
-                    "fillColor": color,
-                    "color": color,
-                    "fillOpacity": op,
-                    "weight": weight,
-                },
-            )
-        )
-
-    for i in lay:
-        m.add_child(i)
-
     
-    loc = f"Isochrone de {nom}"
-    title_html = f"""
-                 &lt;h3 align="center" style="font-size:22px"&gt;&lt;b&gt;{loc}&lt;/b&gt;&lt;/h3&gt;
-                 """
-
-    for i in range((len(dist) - 1), 0 - 1, -1):
-        m.keep_in_front(lay[i])
-
-    test = [i / 60 for i in dist]
-
-    m.add_child(MeasureControl())
-    m.get_root().html.add_child(folium.Element(title_html))
-    m.fit_bounds(
-        [
-            gdf.total_bounds[1],
-            gdf.total_bounds[0],
-            gdf.total_bounds[-1],
-            gdf.total_bounds[2],
+    fig = go.Figure(
+        data=[
+            go.Choroplethmapbox(
+                geojson=kek,
+                locations=gdf.index,
+                z=gdf["min"].astype(float),
+                colorscale=[
+                    [0, color[0]],
+                    [0.1, color[0]],
+                    [0.1, color[0]],
+                    [0.2, color[0]],
+                    [0.2, color[1]],
+                    [0.3, color[1]],
+                    [0.3, color[1]],
+                    [0.4, color[1]],
+                    [0.4, color[2]],
+                    [0.5, color[2]],
+                    [0.5, color[2]],
+                    [0.6, color[2]],
+                    [0.6, color[3]],
+                    [0.7, color[3]],
+                    [0.7, color[3]],
+                    [0.8, color[3]],
+                    [0.8, color[4]],
+                    [0.9, color[4]],
+                    [0.9, color[4]],
+                    [1.0, color[4]],
+                ],
+                colorbar=dict(tick0=0, dtick=10),
+            )
         ]
     )
-    template = """
-{% macro html(this, kwargs) %}
 
-  &lt;link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"&gt;
+    fig.update_layout(
+        height=550,
+        title_x=0.5,
+        title_y=0.93,
+        font=dict(
+            size=15,
+            family=family,
+        ),
+        mapbox=dict(
+            center=dict(lat=gdf["center"][0][1], lon=gdf["center"][0][0]),
+            accesstoken=tok,
+            zoom=8.4,
+            style="streets",
+        ),
+    )
 
-  &lt;script src="https://code.jquery.com/jquery-1.12.4.js"&gt;&lt;/script&gt;
-  &lt;script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"&gt;&lt;/script&gt;
-  
+    fig.update_traces(
+        colorbar_len=0.35,
+        colorbar_orientation="h",
+        marker_opacity=0.7,
+        marker_line_width=0.2,
+        hoverlabel_bgcolor="white",
+        hoverinfo="z",
+        hovertemplate="<extra></extra>%{z} minutes",
+        colorbar_thickness=15,
+        colorbar_y=0.07,
+        colorbar_x=0.8075,
+        colorbar_outlinewidth=0,
+        colorbar_bgcolor="rgba(255,255,255,0.8)",
+        colorbar_tickfont=dict(family=family, size=12, color="gray"),
+        colorbar_title_side="top",
+        colorbar_title_text="<b>Trajets en voiture (minutes)",
+        colorbar_title_font=dict(family=family, color="rgb(100,100,100)", size=13),
+        colorbar_ticklabelposition="outside bottom",
+    )
+    fig.update_layout(margin={"r": 0, "l": 0, "b": 0, "t": 0})
+    fig.write_image(f"C:/Users/Florian/Desktop/AASITE/public_html/imagr/iso.svg")
+    fig.update_layout(margin={"r": 0, "l": 0, "b": 0, "t": 90})
+    fig.update_layout(
+        {
+            "plot_bgcolor": "#fcfcfc",
+            "paper_bgcolor": "#fcfcfc",
+        },
+        title_text=f"<b>Isochrone de {ville}",
+        height=700,
+        coloraxis_colorbar_y=-1,
+    )
+    fig.write_html(
+        f"C:/Users/Florian/Desktop/AASITE/public_html/iso.html",
+        config={"displayModeBar": False},
+    )
 
-&lt;/head&gt;
-&lt;body&gt;
-
- 
-&lt;div id='maplegend' class='maplegend' 
-    style='filter: drop-shadow(0 0 5px rgb(218, 218, 218));position: absolute;margin-bottom:10%; z-index:999; background-color:rgba(255, 255, 255, 0.8);
-     border-radius:0px; padding: 10px; font-size:14px; right: 20px; bottom: 20px;'&gt;
-     
-&lt;div class='legend-title'&gt;Déplacements en&lt;br&gt;voiture (minutes)&lt;/div&gt;
-&lt;div class='legend-scale'&gt;
-  &lt;ul class='legend-labels'&gt;
-    &lt;li&gt;&lt;span style='background:seagreen;opacity:0.6;'&gt;&lt;/span&gt;10&lt;/li&gt;
-    &lt;li&gt;&lt;span style='background:yellowgreen;opacity:0.6;'&gt;&lt;/span&gt;15&lt;/li&gt;
-    &lt;li&gt;&lt;span style='background:gold;opacity:0.6;'&gt;&lt;/span&gt;25&lt;/li&gt;
-    &lt;li&gt;&lt;span style='background:darkorange;opacity:0.6;'&gt;&lt;/span&gt;40&lt;/li&gt;
-    &lt;li&gt;&lt;span style='background:red;opacity:0.6;'&gt;&lt;/span&gt;60&lt;/li&gt;
-    
-
-  &lt;/ul&gt;
-&lt;/div&gt;
-&lt;/div&gt;
- 
-&lt;/body&gt;
-&lt;/html&gt;
-
-&lt;style type='text/css'&gt;
-  .maplegend .legend-title {
-    text-align: left;
-    margin-bottom: 5px;
-    font-weight: bold;
-    font-size: 90%;
-    }
-  .maplegend .legend-scale ul {
-    margin: 0;
-    margin-bottom: 5px;
-    padding: 0;
-    float: left;
-    list-style: none;
-    }
-  .maplegend .legend-scale ul li {
-    font-size: 80%;
-    list-style: none;
-    margin-left: 0;
-    line-height: 18px;
-    margin-bottom: 2px;
-    }
-  .maplegend ul.legend-labels li span {
-    display: block;
-    float: left;
-    height: 16px;
-    width: 30px;
-    margin-right: 5px;
-    margin-left: 0;
-    }
-  .maplegend .legend-source {
-    font-size: 80%;
-    color: #777;
-    clear: both;
-    }
-  .maplegend a {
-    color: #777;
-    }
-&lt;/style&gt;
-{% endmacro %}"""
-
-    macro = MacroElement()
-    macro._template = Template(template)
-
-    m.get_root().add_child(macro)
-    m.save(outfile="C:/Users/Florian/Desktop/AASITE/public_html/iso.html")
-    return m
+    return fig
 
 
-iso("Bordeaux")
-
+iso("Pau")
 </code></pre>
 <br>
 

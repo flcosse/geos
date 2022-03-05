@@ -193,7 +193,7 @@ def iso(ville):
     fig.update_layout(
         height=550,
         title_x=0.5,
-        title_y=0.93,
+        title_y=0.95,
         font=dict(
             size=15,
             family=family,
@@ -202,18 +202,17 @@ def iso(ville):
             center=dict(lat=gdf["center"][0][1], lon=gdf["center"][0][0]),
             accesstoken=tok,
             zoom=8.4,
-            style="streets",
+            style="mapbox://styles/mapbox/streets-v11",
         ),
     )
+
 
     fig.update_traces(
         colorbar_len=0.35,
         colorbar_orientation="h",
         marker_opacity=0.7,
         marker_line_width=0.2,
-        hoverlabel_bgcolor="white",
-        hoverinfo="z",
-        hovertemplate="<extra></extra>%{z} minutes",
+        hoverinfo="none",
         colorbar_thickness=15,
         colorbar_y=0.07,
         colorbar_x=0.8075,
@@ -246,6 +245,7 @@ def iso(ville):
 
 
 iso("Pau")
+
 </code></pre>
 <br>
 

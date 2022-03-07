@@ -130,52 +130,90 @@ from dash.dependencies import Input, Output
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP,])
 server = app.server
 config = {"displayModeBar": False}
-loading_style = {'position': 'absolute', 'align-self': 'center'}
+loading_style = {'position': 'relative',"margin-left":"auto","margin-right":"auto","top":"50vh","z-index":"999"}
 
 app.layout = html.Div(
-    [
-dcc.Input(
+    [html.Div([dcc.Loading(
+                    id="loading",
+                    type="default",
+        parent_style=loading_style,
+                ),html.Div([html.Label("Chercher une ville", style={"font-weight":"bold","color": "dimgrey","width":"20vh"}
+                ),
+        dcc.Input(
             id="input1",
             type="text",
-            placeholder="Chercher une ville",
             value="Pau",
             debounce=True,
-            style={
+
+        )],style={
                 "border": "0px solid rgba(255,255,255,1)",
-                "filter": "drop-shadow(0 0 5px rgb(190, 190,190))",
                 "background-color": "rgba(250,250,250,1)",
                 "z-index": "999",
-                "width": "18vh",
+                "width": "27vh",
                 "position": "relative",
                 "top": "7vh",
-                "left": "12vh",
-                "padding":"1vh"
+                "left": "4vh",
+                "padding": "1vh",
+            },),
+        html.Div(
+            [
+                html.Label(
+                    "Modes", style={"padding-right": "1vh","font-weight":"bold","color": "dimgrey"}
+                ),
+                dcc.RadioItems(
+                    id="input-radio-button",
+                    options=[
+                        {"label": " Voiture", "value": "driving-car"},
+                        {"label": " Vélo", "value": "cycling-regular"},
+                        {"label": " À pieds", "value": "foot-walking"},
+                    ],
+                    style={"padding": "1vh",},
+                    value="driving-car",
+                ),
+            ],
+            style={
+                "position": "relative",
+                "z-index": "999",
+                "background-color": "rgba(250,250,250,1)",
+                "top": "19vh",
+                "padding": "1vh",
+                "width": "15vh",
+                "left": "4vh",
             },
         ),
-        html.Div([html.Label("Incrémentation de l'isochrone",style={"padding-right":"1vh"}),dcc.Input(
-            id="inc",
-            type="number",
-            min=2,
-            max=11,
-            value=10,
-            debounce=True,
-            style={"width":"5.5vh","text-align":"center"}
-        ),
-        ],            style={
+        html.Div(
+            [html.Label("Isochrone",style={"padding-right": "1vh","font-weight":"bold","color": "dimgrey"}),html.Br(),
+                html.Label("Incrémentation (min)"),
+                dcc.Input(
+                    id="inc",
+                    type="number",
+                    min=2,
+                    max=11,
+                    value=10,
+                    debounce=True,
+                    style={
+                        "width": "5.5vh",
+                        "text-align": "center",
+                        "margin-left": "1vh",
+                    },
+                ),
+            ],
+            style={
                 "border": "0px solid rgba(255,255,255,1)",
-                "filter": "drop-shadow(0 0 5px rgb(190, 190,190))",
                 "background-color": "rgba(250,250,250,1)",
                 "z-index": "999",
-                "width": "34.5vh",
+                "width": "27vh",
                 "position": "relative",
-                "top": "9vh",
-                "left": "12vh",
-                "padding":"1vh",
-                "display":"flex"
-            }
+                "top": "-7vh",
+                "left": "4vh",
+                "padding": "1vh",
+            },
         ),
         html.Div(
-            [html.Label("Opacité",style={"font-weight":"bold","color":"dimgrey"}),
+            [
+                html.Label(
+                    "Opacité", style={"font-weight": "bold", "color": "dimgrey"}
+                ),
                 dcc.Slider(
                     value=1,
                     step=0.2,
@@ -190,31 +228,34 @@ dcc.Input(
                         1: "100%",
                     },
                     id="op",
-                )
+                ),
             ],
             style={
                 "z-index": "999",
                 "position": "relative",
-                "top": "74vh",
-                "width": "35vh",
-                "left": "28vh",
+                "top": "12vh",
+                "width": "27vh",
+                "left": "4vh",
                 "background-color": "rgba(250,250,250,1)",
-                "filter": "drop-shadow(0 0 9px rgb(190, 190,190))",
                 "padding-left": "1vh",
-                
             },
-        ),html.Div([
-        dcc.Graph(
-            id="our_graph",
-            style={
-                "width": "100%",
-                "height": "100vh",
-                "position": "absolute",
-                "top": "0",
-                "left": "0",
-            },
-            config=config,
-        ),dcc.Loading(id='loading',type="default",style= {'position': 'relative', "left":"88.5vh","top":"31.5vh"},parent_style=loading_style)]),
+        )]),
+        html.Div(
+            [
+                dcc.Graph(
+                    id="our_graph",
+                    style={
+                        "width": "100%",
+                        "height": "100vh",
+                        "position": "absolute",
+                        "top": "0",
+                        "left": "0",
+                    },
+                    config=config,
+                ),
+
+            ]
+        ),
     ]
 )
 
@@ -226,10 +267,11 @@ dcc.Input(
         Input(component_id="input1", component_property="value"),
         Input(component_id="op", component_property="value"),
         Input(component_id="inc", component_property="value"),
+        Input(component_id="input-radio-button", component_property="value"),
     ],
 )
 
-def iso(input1,op,inc):
+def iso(input1,op,inc,mode):
         new_loading_style = loading_style
         nom = input1
         geolocator = Nominatim(user_agent="myapplication")
@@ -248,7 +290,7 @@ def iso(input1,op,inc):
         'Authorization': '5b3ce3597851110001cf6248df22650771d94c06a73d6fb78ba4706b',
         'Content-Type': 'application/json; charset=utf-8'
         }
-        call = requests.post('https://api.openrouteservice.org/v2/isochrones/driving-car', json=body, headers=headers)
+        call = requests.post(f'https://api.openrouteservice.org/v2/isochrones/{mode}', json=body, headers=headers)
         call = call.json()
         gdf = gpd.GeoDataFrame.from_features(call["features"])
 
@@ -311,13 +353,13 @@ def iso(input1,op,inc):
             hoverinfo="none",
             colorbar_thickness=20,
             colorbar_y=0.2,
-            colorbar_x=0.068,
+            colorbar_x=0.02,
             colorbar_outlinewidth=0,
-            colorbar_bgcolor="rgba(255,255,255,0.8)",
+            colorbar_bgcolor="rgba(250,250,250,1)",
             colorbar_tickfont=dict(family=family, size=11, color="gray"),
             colorbar_title_side="top",
             colorbar_title_text="<b>Trajets en<br>voiture (min.)",
-            colorbar_title_font=dict(family=family, color="rgb(100,100,100)", size=13),
+            colorbar_title_font=dict(family=family, color="rgb(100,100,100)", size=15),
         )
         fig.update_layout(legend_itemdoubleclick=False)
         fig.update_layout(margin={"r": 0, "l": 0, "b": 0, "t": 0})

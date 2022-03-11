@@ -143,116 +143,147 @@ from dash.dependencies import Input, Output
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP,])
 server = app.server
 config = {"displayModeBar": False}
-loading_style = {'position': 'relative',"margin-left":"auto","margin-right":"auto","top":"50vh","z-index":"999"}
+loading_style = {'position': 'relative',"margin-left":"auto","margin-right":"auto","top":"40vh","z-index":"999"}
 
 app.layout = html.Div(
-    [html.Div([dcc.Loading(
+    [
+        html.Div(
+            [
+                dcc.Loading(
                     id="loading",
                     type="circle",
-        parent_style=loading_style,
-                ),html.Div([html.Label("Chercher une ville/adresse", style={"font-weight":"bold","color": "dimgrey","width":"auto"}
+                    parent_style=loading_style,
                 ),
-        dcc.Input(
-            id="input1",
-            type="text",
-            value="Pau",
-            debounce=True,
-            style={"width":"100%"}
-        )],style={
-                "border": "0px solid rgba(255,255,255,1)",
-                "background-color": "rgba(250,250,251,255)",
-                "z-index": "999",
-                "width": "15.5%",
-                "position": "relative",
-                "margin-top": "5%",
-                "left": "4vh",
-                "padding": "1vh",
-            },),
-        html.Div(
-            [
-                html.Label(
-                    "Modes", style={"font-weight":"bold","color": "dimgrey"}
-                ),
-                dcc.RadioItems(
-                    id="input-radio-button",
-                    options=[
-                        {"label": " Voiture", "value": "driving-car"},
-                        {"label": " Vélo", "value": "cycling-regular"},
-                        {"label": " À pieds", "value": "foot-walking"},
+                html.Div(
+                    [
+                        html.Label(
+                            "Chercher une ville/adresse",
+                            style={
+                                "font-weight": "bold",
+                                "color": "dimgrey",
+                                "width": "auto",
+                            },
+                        ),
+                        dcc.Input(
+                            id="input1",
+                            type="text",
+                            value="Lyon",
+                            debounce=True,
+                            style={"width": "100%"},
+                        ),
                     ],
-                    style={"padding": "1vh",},
-                    value="driving-car",
-                ),
-            ],
-            style={
-                "position": "relative",
-                "z-index": "999",
-                "background-color": "rgba(250,250,251,255)",
-                "padding": "1vh",
-                "margin-top":"1%",
-                "width": "8%",
-                "left": "4vh",
-            },
-        ),
-        html.Div(
-            [html.Label("Isochrone",style={"padding-right": "1vh","font-weight":"bold","color": "dimgrey"}),html.Br(),
-                html.Label("Incrémentation (min)"),
-                dcc.Input(
-                    id="inc",
-                    type="number",
-                    min=2,
-                    max=11,
-                    value=10,
-                    debounce=True,
                     style={
-                        "width": "5.5vh",
-                        "text-align": "center",
-                        "margin-left": "1vh",
+                        "border": "0px solid rgba(255,255,255,1)",
+                        "background-color": "rgba(250,250,251,255)",
+                        "z-index": "999",
+                        "width": "15.5%",
+                        "position": "relative",
+                        "margin-top": "5%",
+                        "left": "4vh",
+                        "padding": "1vh",
                     },
                 ),
-            ],
-            style={
-                "border": "0px solid rgba(255,255,255,1)",
-                "background-color": "rgba(250,250,251,255)",
-                "z-index": "999",
-                "width": "15.5%",
-                "position": "relative",
-                "left": "4vh",
-                "margin-top":"1%",
-                "padding": "1vh",
-            },
+                html.Div(
+                    [
+                        html.Label(
+                            "Modes", style={"font-weight": "bold", "color": "dimgrey"}
+                        ),
+                        dcc.RadioItems(
+                            id="input-radio-button",
+                            options=[
+                                {"label": " Voiture", "value": "driving-car"},
+                                {"label": " Vélo", "value": "cycling-regular"},
+                                {"label": " À pieds", "value": "foot-walking"},
+                            ],
+                            style={
+                                "padding": "1vh",
+                                "width": "90%",
+                                "display":"inline-block"
+                            },
+                            value="driving-car",
+                        ),
+                    ],
+                    style={
+                        "position": "relative",
+                        "z-index": "999",
+                        "background-color": "rgba(250,250,251,255)",
+                        "padding": "1vh",
+                        "margin-top": "1%",
+                        "width": "8%",
+                        "left": "4vh",
+                        "height":"30%"
+                    },
+                ),
+                html.Div(
+                    [
+                        html.Label(
+                            "Isochrone",
+                            style={
+                                "padding-right": "1vh",
+                                "font-weight": "bold",
+                                "color": "dimgrey",
+                            },
+                        ),
+                        html.Br(),
+                        html.Label("Incrémentation (min)"),
+                        dcc.Input(
+                            id="inc",
+                            type="number",
+                            min=2,
+                            max=11,
+                            value=10,
+                            debounce=True,
+                            style={
+                                "width": "5.5vh",
+                                "text-align": "center",
+                                "margin-left": "1vh",
+                            },
+                        ),
+                    ],
+                    style={
+                        "border": "0px solid rgba(255,255,255,1)",
+                        "background-color": "rgba(250,250,251,255)",
+                        "z-index": "999",
+                        "width": "15.5%",
+                        "position": "relative",
+                        "left": "4vh",
+                        "margin-top": "1%",
+                        "padding": "1vh",
+                    },
+                ),
+                html.Div(
+                    [
+                        html.Label(
+                            "Opacité", style={"font-weight": "bold", "color": "dimgrey"}
+                        ),
+                        dcc.Slider(
+                            value=1,
+                            step=0.2,
+                            min=0,
+                            max=1,
+                            marks={
+                                0: "0%",
+                                0.2: "20%",
+                                0.4: "40%",
+                                0.6: "60%",
+                                0.8: "80%",
+                                1: "100%",
+                            },
+                            id="op",
+                        ),
+                    ],
+                    style={
+                        "z-index": "999",
+                        "position": "relative",
+                        "width": "15.5%",
+                        "left": "4vh",
+                        "margin-top": "1%",
+                        "background-color": "rgba(250,250,251,255)",
+                        "padding-left": "1vh",
+                    },
+                ),
+            ]
         ),
-        html.Div(
-            [
-                html.Label(
-                    "Opacité", style={"font-weight": "bold", "color": "dimgrey"}
-                ),
-                dcc.Slider(
-                    value=1,
-                    step=0.2,
-                    min=0,
-                    max=1,
-                    marks={
-                        0: "0%",
-                        0.2: "20%",
-                        0.4: "40%",
-                        0.6: "60%",
-                        0.8: "80%",
-                        1: "100%",
-                    },
-                    id="op",
-                ),
-            ],
-            style={
-                "z-index": "999",
-                "position": "relative",
-                "width": "15.5%",
-                "left": "4vh",
-                "margin-top":"1%",
-                "background-color": "rgba(250,250,251,255)",
-                "padding-left": "1vh",
-            },
-        )]),
         html.Div(
             [
                 dcc.Graph(
@@ -266,11 +297,11 @@ app.layout = html.Div(
                     },
                     config=config,
                 ),
-
             ]
         ),
     ]
 )
+
 
 
 @app.callback(
@@ -379,7 +410,7 @@ def iso(input1,op,inc,mode):
             mapbox=dict(
                 center=dict(lat=lat, lon=lon),
                 accesstoken=tok,
-                zoom=9,
+                zoom=8.8,
                 uirevision="oui",
                 style="mapbox://styles/mapbox/streets-v11"
             ),

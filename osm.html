@@ -103,208 +103,214 @@
 			<!-- End Featured Image -->
 
 			<!-- Begin Post Content -->
-			<pre><code class="python">import numpy as np
-import pandas as pd
-import plotly.express as px
+			<pre><code class="python">import requests
+import geopandas as gpd
+from geopy.geocoders import Nominatim
+import plotly.graph_objects as go
+import json
+import dash_bootstrap_components as dbc
+import dash
+from dash import dcc
+from dash import html
+from dash.dependencies import Input, Output
 
-ville = "Pontacq"
-outpt = "C:/Users/Florian/Desktop/sortie.gpkg"
-processing.run("quickosm:downloadosmdatainareaquery", 
-{'KEY':'landuse',
-'VALUE':"",
-'AREA':ville,
-'TIMEOUT':120,
-'SERVER':'https://lz4.overpass-api.de/api/interpreter',
-'FILE':outpt})
-iface.addVectorLayer("C:/Users/Florian/Desktop/sortie.gpkg|layername=sortie_multipolygons","","ogr")
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP,])
+server = app.server
+config = {"displayModeBar": False}
+loading_style = {'position': 'relative',"margin-left":"auto","margin-right":"auto","top":"50vh","z-index":"999"}
 
-landuse1 = QgsProject.instance().mapLayersByName('sortie sortie_multipolygons')[0]
-inpt = QgsVectorLayer('C:/Users/Florian/Desktop/sortie.gpkg|layername=sortie_multipolygons',"","ogr")
+app.layout = html.Div(
+    [html.Div([html.Div([dcc.Input(
+            id="input1",
+            type="text",
+            value="Pau",
+            debounce=True,
+            style={"width":"100%"}
+        )],style={
+                "border": "0px solid rgba(255,255,255,1)",
+                "background-color": "rgba(250,250,251,255)",
+                "z-index": "999",
+                "width": "15.5%",
+                "position": "relative",
+                "margin-top": "5%",
+                "left": "4vh",
+                "padding": "1vh",
+            },)]),
+        html.Div(
+            [
+                dcc.Graph(
+                    id="our_graph",
+                    style={
+                        "width": "100%",
+                        "height": "100vh",
+                        "position": "absolute",
+                        "top": "0",
+                        "left": "0",
+                    },
+                    config=config,
+                ),
 
-processing.run("native:reprojectlayer", 
-{'INPUT':inpt,
-'TARGET_CRS':QgsCoordinateReferenceSystem('EPSG:2154'),
-'OPERATION':'+proj=pipeline +step +proj=unitconvert +xy_in=deg +xy_out=rad +step +proj=lcc +lat_0=46.5 +lon_0=3 +lat_1=49 +lat_2=44 +x_0=700000 +y_0=6600000 +ellps=GRS80',
-'OUTPUT':'C:/Users/Florian/Desktop/poly.shp'})
-iface.addVectorLayer("C:/Users/Florian/Desktop/poly.shp","","ogr")
-landuse1 = QgsProject.instance().mapLayersByName('poly')[0]
+            ]
+        ),
+    ]
+)
 
-column = QgsField("aire",QVariant.Double)
-landuse1.dataProvider().addAttributes([column])
-landuse1.updateFields()
-exp1 = QgsExpression("$area")
-QgsProject.instance().addMapLayer(landuse1)
-dehors ="C:/Users/Florian/Desktop/zebi.gpkg"
-processing.run("native:refactorfields",
-{'INPUT':'C:/Users/Florian/Desktop/poly.shp','FIELDS_MAPPING':[{'expression': '\"fid\"','length': 0,'name': 'fid','precision': 0,'type': 4},{'expression': '\"full_id\"','length': 0,'name': 'full_id','precision': 0,'type': 10},{'expression': '\"osm_id\"','length': 0,'name': 'osm_id','precision': 0,'type': 10},{'expression': '\"osm_type\"','length': 0,'name': 'osm_type','precision': 0,'type': 10},{'expression': '\"check_date\"','length': 0,'name': 'check_date','precision': 0,'type': 10},{'expression': '\"end_date\"','length': 0,'name': 'end_date','precision': 0,'type': 10},{'expression': '\"substance\"','length': 0,'name': 'substance','precision': 0,'type': 10},{'expression': '\"pipeline\"','length': 0,'name': 'pipeline','precision': 0,'type': 10},{'expression': '\"industrial\"','length': 0,'name': 'industrial','precision': 0,'type': 10},{'expression': '\"capacity:disabled\"','length': 0,'name': 'capacity:disabled','precision': 0,'type': 10},{'expression': '\"aire\"','length': 0,'name': 'aire','precision': 0,'type': 6},{'expression': '\"depot\"','length': 0,'name': 'depot','precision': 0,'type': 10},{'expression': '\"user\"','length': 0,'name': 'user','precision': 0,'type': 10},{'expression': '\"parking\"','length': 0,'name': 'parking','precision': 0,'type': 10},{'expression': '\"park_ride\"','length': 0,'name': 'park_ride','precision': 0,'type': 10},{'expression': '\"operator:type\"','length': 0,'name': 'operator:type','precision': 0,'type': 10},{'expression': '\"fee\"','length': 0,'name': 'fee','precision': 0,'type': 10},{'expression': '\"capacity\"','length': 0,'name': 'capacity','precision': 0,'type': 10},{'expression': '\"amenity\"','length': 0,'name': 'amenity','precision': 0,'type': 10},{'expression': '\"leisure\"','length': 0,'name': 'leisure','precision': 0,'type': 10},{'expression': '\"access\"','length': 0,'name': 'access','precision': 0,'type': 10},{'expression': '\"description\"','length': 0,'name': 'description','precision': 0,'type': 10},{'expression': '\"substation\"','length': 0,'name': 'substation','precision': 0,'type': 10},{'expression': '\"power\"','length': 0,'name': 'power','precision': 0,'type': 10},{'expression': '\"start_date\"','length': 0,'name': 'start_date','precision': 0,'type': 10},{'expression': '\"addr:street\"','length': 0,'name': 'addr:street','precision': 0,'type': 10},{'expression': '\"addr:postcode\"','length': 0,'name': 'addr:postcode','precision': 0,'type': 10},{'expression': '\"addr:housenumber\"','length': 0,'name': 'addr:housenumber','precision': 0,'type': 10},{'expression': '\"addr:city\"','length': 0,'name': 'addr:city','precision': 0,'type': 10},{'expression': '\"natural\"','length': 0,'name': 'natural','precision': 0,'type': 10},{'expression': '\"sport\"','length': 0,'name': 'sport','precision': 0,'type': 10},{'expression': '\"intermittent\"','length': 0,'name': 'intermittent','precision': 0,'type': 10},{'expression': '\"wall\"','length': 0,'name': 'wall','precision': 0,'type': 10},{'expression': '\"building\"','length': 0,'name': 'building','precision': 0,'type': 10},{'expression': '\"leaf_type\"','length': 0,'name': 'leaf_type','precision': 0,'type': 10},{'expression': '\"CLC:year\"','length': 0,'name': 'CLC:year','precision': 0,'type': 10},{'expression': '\"CLC:id\"','length': 0,'name': 'CLC:id','precision': 0,'type': 10},{'expression': '\"CLC:code\"','length': 0,'name': 'CLC:code','precision': 0,'type': 10},{'expression': '\"wikipedia\"','length': 0,'name': 'wikipedia','precision': 0,'type': 10},{'expression': '\"research\"','length': 0,'name': 'research','precision': 0,'type': 10},{'expression': '\"operator\"','length': 0,'name': 'operator','precision': 0,'type': 10},{'expression': '\"alt_name\"','length': 0,'name': 'alt_name','precision': 0,'type': 10},{'expression': '\"religion\"','length': 0,'name': 'religion','precision': 0,'type': 10},{'expression': '\"denomination\"','length': 0,'name': 'denomination','precision': 0,'type': 10},{'expression': '\"barrier\"','length': 0,'name': 'barrier','precision': 0,'type': 10},{'expression': '\"residential\"','length': 0,'name': 'residential','precision': 0,'type': 10},{'expression': '\"opening_hours\"','length': 0,'name': 'opening_hours','precision': 0,'type': 10},{'expression': '\"website\"','length': 0,'name': 'website','precision': 0,'type': 10},{'expression': '\"name\"','length': 0,'name': 'name','precision': 0,'type': 10},{'expression': '\"type\"','length': 0,'name': 'type','precision': 0,'type': 10},{'expression': '\"landuse\"','length': 0,'name': 'landuse','precision': 0,'type': 10}],'OUTPUT':dehors})
-iface.addVectorLayer(dehors,"","ogr")
-landuse = QgsProject.instance().mapLayersByName('zebi')[0]
-context = QgsExpressionContext()
-context.appendScopes(QgsExpressionContextUtils.globalProjectLayerScopes(landuse))
 
-output2 = "C:/Users/Florian/Desktop/découpé.shp"
-processing.run("native:clip", 
-{'INPUT':'C:/Users/Florian/Desktop/poly.shp',
-'OVERLAY':'C:/Users/Florian/Desktop/département/COMMUNE.shp|subset=\"NOM_COM\" = \'{}''\''.format(ville),
-'OUTPUT':output2})
-iface.addVectorLayer(output2,"","ogr")
-landuse = QgsProject.instance().mapLayersByName('découpé')[0]
-
-type = []
-aire = []
-
-with edit(landuse):
-    for f in landuse.getFeatures():
-        context.setFeature(f)
-        f['aire'] = exp1.evaluate(context)
-        landuse.updateFeature(f)
-
-for f in landuse.getFeatures():
-    aire.append(f["aire"])
-    type.append(f["landuse"])
+@app.callback(Output('our_graph','figure'),
     
-for f in aire:
-    f = float(f)
-aire[:] = [x / 1000000 for x in aire]
-df = pd.DataFrame(type)
-df = df.rename(columns={0: "Landuse"})
-df["surface"] = aire
-
-df = df.groupby(["Landuse"]).sum()
-df = df.sort_values(["surface"], ascending=False)
-other = df["surface"].iloc[4:].sum()
-df = df.reset_index()
-df["Landuse"] = df["Landuse"].replace(
-    [
-        "farmland",
-        "military",
-        "forest",
-        "meadow",
-        "residential",
-        "farmyard",
-        "grass",
-        "industrial",
-        "retail",
-        "cemetery",
-        "vineyard",
-        "basin",
-        "commercial",
-        "village_green",
-        "univeristy",
-        "construction",
-        "tourism",
-        "healthcare",
-        "quarry",
-        "railway",
-        "recreation_ground",
-        "garages",
-        "landfill",
-        "brownfield",
-        "port",
-    ],
-    [
-        "Terres agricoles",
-        "Militaire",
-        "Forêts",
-        "Pré/prairie",
-        "Zones résidentielles",
-        "Ferme",
-        "Pelouse",
-        "Industriel",
-        "Marché",
-        "Cimetière",
-        "Vignoble",
-        "Bassin",
-        "Commercial",
-        "Village vert",
-        "Université",
-        "Construction",
-        "Tourisme",
-        "Hôpitaux",
-        "Carrière de surface",
-        "Chemin de fer",
-        "Terrains de loisirs",
-        "Garages",
-        "Décharge",
-        "Friches industrielles",
-        "Port",
-    ],
+        Input(component_id="input1", component_property="value")
+    ,
 )
 
-line = {"Landuse": "Autre", "surface": other}
-df = df.append(line, ignore_index=True)
-df = df.iloc[[0, 1, 2, 3, -1]]
-domaine = df["Landuse"].tolist()
-surface = df["surface"].tolist()
-aire = [round(num) for num in surface]
-
-couleur = []
-color = {
-    "Terres agricoles": "gold",
-    "Militaire": "peru",
-    "Industriel": "red",
-    "Pré/prairie": "wheat",
-    "Forêts": "Green",
-    "Autre": "lightgrey",
-    "Zones résidentielles": "orangered",
-    "Marché": "brown",
-    "Vignoble": "blueviolet",
-    "Construction": "orange",
-    "Commercial": "yellow",
-    "Pelouse": "lawngreen",
-    "Tourisme": "chocolate",
-    "Carrière de surface": "darkgrey",
-    "Chemin de fer": "grey",
-    "Terrains de loisirs": "pink",
-    "Garages": "saddlebrown",
-    "Décharge": "goldenrod",
-    "Friches industrielles": "sienna",
-    "port": "royalblue",
-}
-
-df["surface"] = df["surface"].round(decimals=1)
-df = df.sort_values(by=["Landuse"], ascending=True)
-liste = df["Landuse"].tolist()
-set = []
-
-liste = sorted(liste, reverse=False)
-color = {key: value for key, value in sorted(color.items())}
-for i, j in color.items():
-    for k in liste:
-        if i == k:
-            set.append(j)
-color = dict(zip(liste, set))
-fig = px.pie(
-    df,
-    values="surface",
-    names="Landuse",
-    color="Landuse",
-    color_discrete_map=color,
-    hole=.4
-)
-family='-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif',
-fig.update_traces(hovertemplate='Occupation : %{label}<br>Surface : %{value}km²')
-fig.update_layout(
-    font=dict(
-        family='-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif',
-        size=13,
+def diag(input1):
+    place_name = input1
+    tags = {'landuse': True}   
+    land = ox.geometries_from_place(place_name, tags)
+    land = land.to_crs("epsg:2154")
+    limite = gpd.read_file(r"C:\Users\Florian\Desktop\département\COMMUNE.SHP")
+    limite = limite[limite["NOM_COM"] == place_name]
+    land = land.clip(limite)
+    land["surface"] = land.area
+    land = land.groupby("landuse").sum("surface").reset_index()
+    land = land.sort_values("surface", ascending=False)
+    other = land["surface"].iloc[4:].sum()
+    line = {"landuse": "Autre","surface": other}
+    land["landuse"] = land["landuse"].replace(
+        [
+            "farmland",
+            "military",
+            "forest",
+            "meadow",
+            "residential",
+            "farmyard",
+            "grass",
+            "industrial",
+            "retail",
+            "cemetery",
+            "vineyard",
+            "basin",
+            "commercial",
+            "village_green",
+            "university",
+            "construction",
+            "tourism",
+            "healthcare",
+            "quarry",
+            "railway",
+            "recreation_ground",
+            "garages",
+            "landfill",
+            "brownfield",
+            "port",
+        ],
+        [
+            "Terres agricoles",
+            "Militaire",
+            "Forêts",
+            "Pré/prairie",
+            "Zones résidentielles",
+            "Ferme",
+            "Pelouse",
+            "Industriel",
+            "Marché",
+            "Cimetière",
+            "Vignoble",
+            "Bassin",
+            "Commercial",
+            "Village vert",
+            "Université",
+            "Construction",
+            "Tourisme",
+            "Hôpitaux",
+            "Carrière de surface",
+            "Chemin de fer",
+            "Terrains de loisirs",
+            "Garages",
+            "Décharge",
+            "Friches industrielles",
+            "Port",
+        ],
     )
-)
+    land = land.append(line, ignore_index=True)
+    land = land.iloc[[0, 1, 2, 3, -1]].reset_index()
 
-fig.update_layout(title_text=f"Occupation du sol dans le ville de {ville} ",title_x=0.5,title_y=0.95,font=dict(size=12,family='-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif',))
+    couleur = []
+    color = {
+        "Terres agricoles": "gold",
+        "Militaire": "peru",
+        "Industriel": "red",
+        "Pré/prairie": "wheat",
+        "Forêts": "Green",
+        "Autre": "lightgrey",
+        "Zones résidentielles": "orangered",
+        "Marché": "brown",
+        "Vignoble": "blueviolet",
+        "Construction": "orange",
+        "Commercial": "yellow",
+        "Pelouse": "lawngreen",
+        "Tourisme": "chocolate",
+        "Carrière de surface": "darkgrey",
+        "Chemin de fer": "grey",
+        "Terrains de loisirs": "pink",
+        "Garages": "saddlebrown",
+        "Décharge": "goldenrod",
+        "Friches industrielles": "sienna",
+        "port": "royalblue",
+    }
+    liste = land["landuse"].tolist()
+    set = []
 
-fig.update_layout(legend=dict(
-    yanchor="top",
-    y=-0.1,
-    xanchor="left",
-    x=0,
-    orientation="h"
-))
-fig.update_layout(legend_itemdoubleclick=False)
-fig.layout.xaxis.fixedrange = True
-fig.layout.yaxis.fixedrange = True
-fig.write_html(f"C:/Users/Florian/Desktop/AASITE/public_html/file.html",config={'displayModeBar': False})
-fig.write_image(f"C:/Users/Florian/Desktop/AASITE/public_html/imagr/est.svg")
+    liste = sorted(liste, reverse=False)
+    color = {key: value for key, value in sorted(color.items())}
+    for i, j in color.items():
+        for k in liste:
+            if i == k:
+                set.append(j)
+    color = dict(zip(liste, set))
+
+    land["surface"] = [i/1000000 for i in land["surface"]]
+    land["surface"] = land["surface"].round(decimals=1)
+
+    fig = px.pie(
+        land,
+        values="surface",
+        names="landuse",
+        color="landuse",
+        color_discrete_map=color,
+        hole=.4
+    )
+    family='-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif',
+    fig.update_traces(hovertemplate='Occupation : %{label}<br>Surface : %{value}km²')
+    fig.update_layout(
+        font=dict(
+            family='-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif',
+            size=13,
+        )
+    )
+    fig.update_layout(title_text=f"Occupation du sol dans le ville de {place_name} ",title_x=0.5,title_y=0.95,font=dict(size=12,family='-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif',))
+
+    fig.update_layout(legend=dict(
+        xanchor="center",
+        orientation="h",
+        x=0.5
+    ))
+
+
+    fig.update_layout(legend_itemdoubleclick=False)
+    fig.layout.xaxis.fixedrange = True
+    fig.layout.yaxis.fixedrange = True
+
+    fig.update_layout(
+            {
+                "plot_bgcolor": "#fafafb",
+                "paper_bgcolor": "#fafafb",
+            }
+        )
+    return fig
+
+
+if __name__ == '__main__':
+        app.run_server(debug=False)
 
 </code></pre>
 <br>

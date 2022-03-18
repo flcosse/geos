@@ -80,7 +80,7 @@
 				
 				<!-- End Top Menta -->
 
-				<h1 class="posttitle">Visualisation des données "landuse" d'OpenStreetMap avec PyQGIS</h1>
+				<h1 class="posttitle">Visualisation des données "landuse" d'OpenStreetMap avec osmnx</h1>
 				
 			</div>
             <div class="after-post-tags">
@@ -95,7 +95,7 @@
 
 			<!-- Begin Featured Image -->
             <p>
-                Ce diagramme utilise les données d'OpenStreetMap récupérés à partir de l'extension QuickOSM. Des calculs faits avec la calculatrice de champs de QGIS et Pandas récupèrent les superficies et leurs attributs. Le graphique est ensuite généré par Plotly.
+                Ce diagramme utilise les données d'OpenStreetMap récupérés à partir de la librairie osmnx. La librairie envoie une requête aux serveurs d'OpenStreetMap qui nous renvoient les données de landue. Le graphique est ensuite généré par Plotly.
             </p>
 			<!-- Begin Featured Image -->
 			
@@ -108,59 +108,8 @@ import geopandas as gpd
 from geopy.geocoders import Nominatim
 import plotly.graph_objects as go
 import json
-import dash_bootstrap_components as dbc
-import dash
-from dash import dcc
-from dash import html
-from dash.dependencies import Input, Output
-
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP,])
-server = app.server
-config = {"displayModeBar": False}
-loading_style = {'position': 'relative',"margin-left":"auto","margin-right":"auto","top":"50vh","z-index":"999"}
-
-app.layout = html.Div(
-    [html.Div([html.Div([dcc.Input(
-            id="input1",
-            type="text",
-            value="Pau",
-            debounce=True,
-            style={"width":"100%"}
-        )],style={
-                "border": "0px solid rgba(255,255,255,1)",
-                "background-color": "rgba(250,250,251,255)",
-                "z-index": "999",
-                "width": "15.5%",
-                "position": "relative",
-                "margin-top": "5%",
-                "left": "4vh",
-                "padding": "1vh",
-            },)]),
-        html.Div(
-            [
-                dcc.Graph(
-                    id="our_graph",
-                    style={
-                        "width": "100%",
-                        "height": "100vh",
-                        "position": "absolute",
-                        "top": "0",
-                        "left": "0",
-                    },
-                    config=config,
-                ),
-
-            ]
-        ),
-    ]
-)
-
-
-@app.callback(Output('our_graph','figure'),
-    
-        Input(component_id="input1", component_property="value")
-    ,
-)
+import osmnx as ox
+import plotly.express as px
 
 def diag(input1):
     place_name = input1
@@ -175,62 +124,6 @@ def diag(input1):
     land = land.sort_values("surface", ascending=False)
     other = land["surface"].iloc[4:].sum()
     line = {"landuse": "Autre","surface": other}
-    land["landuse"] = land["landuse"].replace(
-        [
-            "farmland",
-            "military",
-            "forest",
-            "meadow",
-            "residential",
-            "farmyard",
-            "grass",
-            "industrial",
-            "retail",
-            "cemetery",
-            "vineyard",
-            "basin",
-            "commercial",
-            "village_green",
-            "university",
-            "construction",
-            "tourism",
-            "healthcare",
-            "quarry",
-            "railway",
-            "recreation_ground",
-            "garages",
-            "landfill",
-            "brownfield",
-            "port",
-        ],
-        [
-            "Terres agricoles",
-            "Militaire",
-            "Forêts",
-            "Pré/prairie",
-            "Zones résidentielles",
-            "Ferme",
-            "Pelouse",
-            "Industriel",
-            "Marché",
-            "Cimetière",
-            "Vignoble",
-            "Bassin",
-            "Commercial",
-            "Village vert",
-            "Université",
-            "Construction",
-            "Tourisme",
-            "Hôpitaux",
-            "Carrière de surface",
-            "Chemin de fer",
-            "Terrains de loisirs",
-            "Garages",
-            "Décharge",
-            "Friches industrielles",
-            "Port",
-        ],
-    )
     land = land.append(line, ignore_index=True)
     land = land.iloc[[0, 1, 2, 3, -1]].reset_index()
 
@@ -301,17 +194,14 @@ def diag(input1):
     fig.layout.yaxis.fixedrange = True
 
     fig.update_layout(
-            {
-                "plot_bgcolor": "#fafafb",
-                "paper_bgcolor": "#fafafb",
-            }
-        )
+        {
+            "plot_bgcolor": "rgba(255,255,255,0)",
+            "paper_bgcolor": "rgba(255,255,255,0)",
+        }
+    )
     return fig
 
-
-if __name__ == '__main__':
-        app.run_server(debug=False)
-
+diag("Pontacq")
 </code></pre>
 <br>
 			<!-- End Post Content -->

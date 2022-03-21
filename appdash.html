@@ -257,12 +257,6 @@ def render_page_content(pathname):
                         value=["Charbon"],
                         multi=True,
                         clearable=False,
-                        style={
-                            "width": "auto",
-                            "padding": "0px 0px 2px 0px",
-                            "border-radius": "0px",
-                            "top": "-2vh",
-                        },
                     ),
                     html.Div(
                         [
@@ -296,14 +290,6 @@ def render_page_content(pathname):
                         value="France",
                         multi=False,
                         clearable=False,
-                        style={
-                            "width": "16vh",
-                            "top": "-0.2vh",
-                            "position": "fixed",
-                            "z-index": "9",
-                            "border-radius": "0px",
-                            "filter": "drop-shadow(0 0 0.02rem grey)",
-                        },
                     ),
                     html.Div(
                         [
@@ -324,13 +310,6 @@ def render_page_content(pathname):
                             dcc.Graph(
                                 id="graph1",
                                 figure=[],
-                                style={
-                                    "width": "50%",
-                                    "height": "40vh",
-                                    "float": "left",
-                                    "padding": "1vh",
-                                    "filter": "drop-shadow(0 0 0.05rem grey)",
-                                },
                                 config=config,
                             ),
                         ]
@@ -340,13 +319,6 @@ def render_page_content(pathname):
                             dcc.Graph(
                                 id="graph4",
                                 figure=[],
-                                style={
-                                    "width": "50%",
-                                    "height": "40vh",
-                                    "float": "left",
-                                    "padding": "1vh",
-                                    "filter": "drop-shadow(0 0 0.05rem grey)",
-                                },
                                 config=config,
                             ),
                         ]
@@ -356,13 +328,6 @@ def render_page_content(pathname):
                             dcc.Graph(
                                 id="graph2",
                                 figure=[],
-                                style={
-                                    "width": "50%",
-                                    "height": "40vh",
-                                    "float": "left",
-                                    "padding": "1vh",
-                                    "filter": "drop-shadow(0 0 0.05rem grey)",
-                                },
                                 config=config,
                             ),
                         ]
@@ -372,13 +337,6 @@ def render_page_content(pathname):
                             dcc.Graph(
                                 id="graph5",
                                 figure=[],
-                                style={
-                                    "width": "50%",
-                                    "height": "40vh",
-                                    "float": "left",
-                                    "padding": "1vh",
-                                    "filter": "drop-shadow(0 0 0.05rem grey)",
-                                },
                                 config=config,
                             ),
                         ]

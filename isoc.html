@@ -158,11 +158,6 @@ app.layout = html.Div(
                     [
                         html.Label(
                             "Chercher une ville/adresse",
-                            style={
-                                "font-weight": "bold",
-                                "color": "dimgrey",
-                                "width": "auto",
-                            },
                         ),
                         dcc.Input(
                             id="input1",
@@ -172,16 +167,6 @@ app.layout = html.Div(
                             style={"width": "100%"},
                         ),
                     ],
-                    style={
-                        "border": "0px solid rgba(255,255,255,1)",
-                        "background-color": "rgba(250,250,251,255)",
-                        "z-index": "999",
-                        "width": "15.5%",
-                        "position": "relative",
-                        "margin-top": "5%",
-                        "left": "4vh",
-                        "padding": "1vh",
-                    },
                 ),
                 html.Div(
                     [
@@ -195,34 +180,14 @@ app.layout = html.Div(
                                 {"label": " Vélo", "value": "cycling-regular"},
                                 {"label": " À pieds", "value": "foot-walking"},
                             ],
-                            style={
-                                "padding": "1vh",
-                                "width": "90%",
-                                "display":"inline-block"
-                            },
                             value="driving-car",
                         ),
                     ],
-                    style={
-                        "position": "relative",
-                        "z-index": "999",
-                        "background-color": "rgba(250,250,251,255)",
-                        "padding": "1vh",
-                        "margin-top": "1%",
-                        "width": "8%",
-                        "left": "4vh",
-                        "height":"30%"
-                    },
                 ),
                 html.Div(
                     [
                         html.Label(
                             "Isochrone",
-                            style={
-                                "padding-right": "1vh",
-                                "font-weight": "bold",
-                                "color": "dimgrey",
-                            },
                         ),
                         html.Br(),
                         html.Label("Incrémentation (min)"),
@@ -233,23 +198,8 @@ app.layout = html.Div(
                             max=11,
                             value=10,
                             debounce=True,
-                            style={
-                                "width": "5.5vh",
-                                "text-align": "center",
-                                "margin-left": "1vh",
-                            },
                         ),
                     ],
-                    style={
-                        "border": "0px solid rgba(255,255,255,1)",
-                        "background-color": "rgba(250,250,251,255)",
-                        "z-index": "999",
-                        "width": "15.5%",
-                        "position": "relative",
-                        "left": "4vh",
-                        "margin-top": "1%",
-                        "padding": "1vh",
-                    },
                 ),
                 html.Div(
                     [
@@ -272,15 +222,6 @@ app.layout = html.Div(
                             id="op",
                         ),
                     ],
-                    style={
-                        "z-index": "999",
-                        "position": "relative",
-                        "width": "15.5%",
-                        "left": "4vh",
-                        "margin-top": "1%",
-                        "background-color": "rgba(250,250,251,255)",
-                        "padding-left": "1vh",
-                    },
                 ),
             ]
         ),
@@ -288,13 +229,6 @@ app.layout = html.Div(
             [
                 dcc.Graph(
                     id="our_graph",
-                    style={
-                        "width": "100%",
-                        "height": "100vh",
-                        "position": "absolute",
-                        "top": "0",
-                        "left": "0",
-                    },
                     config=config,
                 ),
             ]

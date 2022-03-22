@@ -182,7 +182,7 @@ pre code {
 	height: 70vh;
 	border-radius: 5px;
 	filter: drop-shadow(0 0 5px rgb(220,220,220));
-	background-color: rgb(250,250,250) !important;
+	background-color: rgb(255, 255, 255) !important;
 	}
 pre code::-webkit-scrollbar {
 	width: 20px;

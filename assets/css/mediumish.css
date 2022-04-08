@@ -395,16 +395,28 @@ ul.tags {
 	text-decoration: none;
 	list-style:none;
 	padding-left:0;
-	margin:0 0 2rem 0;
+	margin:0 0 1rem 0;
+	margin-right: 0%;
+	
 }
 ul.tags li {
 	display:inline-block;
 	font-size:0.9rem;
+	
+	
 }
 ul.tags li a {
-	background:#EFEFEF;
-	color:rgba(0,0,0,.6);
-	padding:5px 10px;
+	background-color:  rgb(229 233 242);
+	color:rgb(120 118 118);
+	padding:10px 10px 10px 10px;
+	
+    border-radius: 1.5rem;
+    border-top-left-radius: 1.5rem;
+    border-top-right-radius: 1.5rem;
+    border-bottom-right-radius: 1.5rem;
+    border-bottom-left-radius: 1.5rem;
+	padding-top: .5rem;
+;
 }
 ul.tags li a:hover {
 	background:rgba(0,0,0,.07);

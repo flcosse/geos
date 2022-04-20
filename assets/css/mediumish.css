@@ -410,11 +410,7 @@ ul.tags li a {
 	color:rgb(120 118 118);
 	padding:10px 10px 10px 10px;
 	
-    border-radius: 1.5rem;
-    border-top-left-radius: 1.5rem;
-    border-top-right-radius: 1.5rem;
-    border-bottom-right-radius: 1.5rem;
-    border-bottom-left-radius: 1.5rem;
+    border-radius: 0.95rem;
 	padding-top: .5rem;
 ;
 }

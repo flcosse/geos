@@ -24,8 +24,8 @@
      inkscape:document-units="mm"
      showgrid="false"
      inkscape:zoom="0.71713664"
-     inkscape:cx="548.01272"
-     inkscape:cy="449.00788"
+     inkscape:cx="382.07503"
+     inkscape:cy="418.33032"
      inkscape:window-width="2160"
      inkscape:window-height="1334"
      inkscape:window-x="-11"
@@ -60,14 +60,14 @@
     <circle
        style="fill:#6c6c6c;fill-opacity:1;stroke:none;stroke-width:3.72727;stroke-linecap:square"
        id="path863-3"
-       cx="74.587532"
-       cy="63.904087"
+       cx="25.517967"
+       cy="95.264336"
        r="15.126708" />
     <circle
        style="fill:#6c6c6c;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:square"
        id="path863-4"
-       cx="80.85955"
-       cy="96.37117"
+       cx="-107.67088"
+       cy="80.875519"
        r="8.1167698" />
     <circle
        style="fill:#6c6c6c;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:square"
@@ -108,8 +108,8 @@
     <circle
        style="fill:#ff0006;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:square"
        id="path863-04"
-       cx="5.226068"
-       cy="17.786074"
+       cx="-9.1627522"
+       cy="36.971169"
        r="8.1167698" />
     <circle
        style="fill:#ff0006;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:square"
@@ -144,8 +144,8 @@
     <circle
        style="fill:#ff0006;fill-opacity:1;stroke:none;stroke-width:1.31818;stroke-linecap:square"
        id="path863-5"
-       cx="31.236609"
-       cy="89.914642"
+       cx="14.26518"
+       cy="154.8488"
        r="5.349689" />
     <circle
        style="fill:#ff0006;fill-opacity:1;stroke:none;stroke-width:1.31818;stroke-linecap:square"
@@ -162,8 +162,8 @@
     <circle
        style="fill:#70c098;fill-opacity:1;stroke:none;stroke-width:1.31818;stroke-linecap:square"
        id="path863-5-0"
-       cx="-16.172693"
-       cy="13.358744"
+       cx="-46.795055"
+       cy="20.368681"
        r="5.349689" />
     <circle
        style="fill:#70c098;fill-opacity:1;stroke:none;stroke-width:1.31818;stroke-linecap:square"
@@ -186,8 +186,8 @@
     <circle
        style="fill:#70c098;fill-opacity:1;stroke:none;stroke-width:1.31818;stroke-linecap:square"
        id="path863-5-0-7"
-       cx="11.913181"
-       cy="97.553108"
+       cx="-1.7377504"
+       cy="95.339447"
        r="5.349689" />
     <circle
        style="fill:#70c098;fill-opacity:1;stroke:none;stroke-width:1.31818;stroke-linecap:square"
@@ -282,8 +282,8 @@
     <circle
        style="fill:#70c098;fill-opacity:1;stroke:none;stroke-width:0.624999;stroke-linecap:square"
        id="path863-5-2"
-       cx="27.59329"
-       cy="3.6278441"
+       cx="-42.137146"
+       cy="48.639023"
        r="2.5364902" />
     <circle
        style="fill:#70c098;fill-opacity:1;stroke:none;stroke-width:0.624999;stroke-linecap:square"
@@ -432,8 +432,8 @@
     <circle
        style="fill:#70c098;fill-opacity:1;stroke:none;stroke-width:0.272727;stroke-linecap:square"
        id="path863-5-94"
-       cx="41.198109"
-       cy="2.843838"
+       cx="-50.668972"
+       cy="36.417751"
        r="1.1068319" />
     <circle
        style="fill:#70c098;fill-opacity:1;stroke:none;stroke-width:0.272727;stroke-linecap:square"
@@ -478,12 +478,6 @@
        cy="50.622101"
        r="1.1068319" />
     <circle
-       style="fill:#ff0006;fill-opacity:1;stroke:none;stroke-width:3.68182;stroke-linecap:square"
-       id="path863-51"
-       cx="-45.872719"
-       cy="15.75688"
-       r="14.942236" />
-    <circle
        style="fill:#ff0006;fill-opacity:1;stroke:none;stroke-width:1.36364;stroke-linecap:square"
        id="path863-0"
        cx="-92.913071"
@@ -492,8 +486,8 @@
     <circle
        style="fill:#ff0006;fill-opacity:1;stroke:none;stroke-width:2;stroke-linecap:square"
        id="path863-1"
-       cx="47.28566"
-       cy="27.747564"
+       cx="-53.436081"
+       cy="83.08918"
        r="8.1167698" />
     <path
        style="fill:none;stroke:#666666;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"

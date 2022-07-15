@@ -116,7 +116,7 @@ for f in point.getFeatures():
     Y = geom1.asPoint().y()
     
 scr = iface.mapCanvas().mapSettings().destinationCrs().authid()
-kek = scr.split(":")
+crs = scr.split(":")
 X1 = []
 Y1 = []
 
@@ -139,7 +139,7 @@ listLayers = QgsProject.instance().mapLayersByName('line')
 output = "C:/Users/Florian/Desktop/Lignes.shp"
 processing.runAndLoadResults("native:mergevectorlayers", 
                              {'LAYERS':listLayers,
-                             'CRS':kek[1],
+                             'CRS':crs[1],
                              'OUTPUT':output})
                              
 layers = QgsProject.instance().mapLayers()

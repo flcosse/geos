@@ -338,8 +338,8 @@ def iso(input1, op, inc, mode):
 
     for i, j in zip(range((len(dist) - 1), -1, -1), range((len(dist) - 2), -1, -1)):
         gdf["geometry"][i] = gdf["geometry"][i].difference(gdf["geometry"][j])
-    kek = gdf.to_json()
-    kek = json.loads(kek)
+    val = gdf.to_json()
+    val = json.loads(val)
     gdf["min"] = [i / 60 for i in gdf["value"]]
     tok = open(".mapbox_token.txt").read()
     color = [
@@ -353,7 +353,7 @@ def iso(input1, op, inc, mode):
     fig = go.Figure(
         data=[
             go.Choroplethmapbox(
-                geojson=kek,
+                geojson=val,
                 locations=gdf.index,
                 z=gdf["min"].astype(float),
                 colorscale=[

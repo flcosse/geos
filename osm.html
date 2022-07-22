@@ -112,11 +112,15 @@ import osmnx as ox
 import plotly.express as px
 
 def diag(input1):
+    print("oui")
     place_name = input1
-    tags = {'landuse': True}   
+    tags = {'landuse': True}
     land = ox.geometries_from_place(place_name, tags)
+    print("oui")
     land = land.to_crs("epsg:2154")
+    print("oui")
     limite = gpd.read_file(r"C:\Users\Florian\Desktop\département\COMMUNE.SHP")
+    print("oui")
     limite = limite[limite["NOM_COM"] == place_name]
     land = land.clip(limite)
     land["surface"] = land.area
@@ -124,23 +128,80 @@ def diag(input1):
     land = land.sort_values("surface", ascending=False)
     other = land["surface"].iloc[4:].sum()
     line = {"landuse": "Autre","surface": other}
+    land["landuse"] = land["landuse"].replace(
+        [
+            "farmland",
+            "military",
+            "forest",
+            "meadow",
+
+            "residential",
+            "farmyard",
+            "grass",
+            "industrial",
+            "retail",
+            "cemetery",
+            "vineyard",
+            "basin",
+            "commercial",
+            "village_green",
+            "university",
+            "construction",
+            "tourism",
+            "healthcare",
+            "quarry",
+            "railway",
+            "recreation_ground",
+            "garages",
+            "landfill",
+            "brownfield",
+            "port",
+        ],
+        [
+            "Terres agricoles",
+            "Militaire",
+            "Forêts",
+            "Pré/prairie",
+            "Zones résidentielles",
+            "Ferme",
+            "Herbe",
+            "Industriel",
+            "Marché",
+            "Cimetière",
+            "Vignoble",
+            "Bassin",
+            "Commercial",
+            "Village vert",
+            "Université",
+            "Construction",
+            "Tourisme",
+            "Hôpitaux",
+            "Carrière de surface",
+            "Chemin de fer",
+            "Terrains de loisirs",
+            "Garages",
+            "Décharge",
+            "Friches industrielles",
+            "Port",
+        ],
+    )
     land = land.append(line, ignore_index=True)
     land = land.iloc[[0, 1, 2, 3, -1]].reset_index()
 
     couleur = []
     color = {
-        "Terres agricoles": "gold",
+        "Terres agricoles": "#ffffa8",
         "Militaire": "peru",
         "Industriel": "red",
         "Pré/prairie": "wheat",
-        "Forêts": "Green",
+        "Forêts": "#8dc56c",
         "Autre": "lightgrey",
-        "Zones résidentielles": "orangered",
+        "Zones résidentielles": "#ccb18b",
         "Marché": "brown",
         "Vignoble": "blueviolet",
         "Construction": "orange",
         "Commercial": "yellow",
-        "Pelouse": "lawngreen",
+        "Herbe": "#ccf24d",
         "Tourisme": "chocolate",
         "Carrière de surface": "darkgrey",
         "Chemin de fer": "grey",
@@ -172,36 +233,39 @@ def diag(input1):
         color_discrete_map=color,
         hole=.4
     )
-    family='-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif',
-    fig.update_traces(hovertemplate='Occupation : %{label}<br>Surface : %{value}km²')
-    fig.update_layout(
-        font=dict(
-            family='-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif',
-            size=13,
-        )
-    )
-    fig.update_layout(title_text=f"Occupation du sol dans le ville de {place_name} ",title_x=0.5,title_y=0.95,font=dict(size=12,family='-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif',))
-
-    fig.update_layout(legend=dict(
-        xanchor="center",
-        orientation="h",
-        x=0.5
-    ))
-
-
-    fig.update_layout(legend_itemdoubleclick=False)
+    family='-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif'
+    fig.update_traces(hovertemplate='Occupation : %{label}<br>Surface : %{value:.0f}km²')
     fig.layout.xaxis.fixedrange = True
     fig.layout.yaxis.fixedrange = True
-
     fig.update_layout(
         {
             "plot_bgcolor": "rgba(255,255,255,0)",
             "paper_bgcolor": "rgba(255,255,255,0)",
-        }
+        },
+        legend_itemdoubleclick=False,
+        legend=dict(xanchor="center", orientation="h", x=0.5),
+        font=dict(
+            family="-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif",
+            size=13,
+        ),
+        hoverlabel=dict(font_size=14, font_family=family),
+        title_x=0.5,
+        title_y=0.95,
     )
+    fig.update_layout(
+        title={
+            'text': f"Occupation du sol dans le ville de {place_name}<br><sup>Source : OpenStreetMap</sup>",
+            'y': 0.95,
+            'x': 0.5,
+            'xanchor': 'center',
+            'yanchor': 'top'})
+
+    fig.update_traces(texttemplate="%{percent:.0%}")
+    fig.write_html(f"C:/Users/Florian/Desktop/AASITE/public_html/file.html",config={'displayModeBar': False})
+
     return fig
 
-diag("Pontacq")
+diag("Pau")
 </code></pre>
 <br>
 			<!-- End Post Content -->

@@ -42,22 +42,22 @@
     className: 'myDivIcon'
 });
 var icon = L.icon({
-    iconUrl: 'gps.png',
-    iconSize:     [30,30], 
+    iconUrl: 'record.png',
+    iconSize:     [15,15], 
     popupAnchor:  [0, 0] 
 });
 
 var icon2 = L.icon({
-    iconUrl: 'gps1.png',
-    iconSize:     [30,30], 
+    iconUrl: 'record1.png',
+    iconSize:     [15,15], 
     popupAnchor:  [0, 0] 
 });
-var pointA = new L.LatLng(45.3991, 4.559);
-var pointB = new L.LatLng(45.76043, 4.835659);
+var pointA = new L.LatLng(44.900002,4.81667);
+var pointB = new L.LatLng(44.900002,4.96667);
 var pointList = [pointA, pointB];
 
 
-	var map = L.map('map').setView([45.583328, 4.76667], 9);
+	var map = L.map('map').setView([44.90015,4.89161], 12);
 
 	var Thunderforest_Landscape = L.tileLayer('https://{s}.tile.thunderforest.com/landscape/{z}/{x}/{y}.png?apikey={apikey}', {
 	attribution: '&copy; <a href="http://www.thunderforest.com/">Thunderforest</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -65,11 +65,11 @@ var pointList = [pointA, pointB];
 	maxZoom: 22
 }).addTo(map);
 
-	var marker = L.marker([45.3991, 4.559], {icon: icon2}).addTo(map)
-		.bindPopup("<b>Lat</b>: 45.3991<br><b>Long</b>: 4.559");
+	var marker = L.marker([44.900002,4.81667], {icon: icon2}).addTo(map)
+		.bindPopup("<b>Départ</b><br><b>Lat</b>: 45.3991<br><b>Long</b>: 4.559");
 
-    var marker = L.marker([45.76043, 4.835659], {icon: icon}).addTo(map)
-		.bindPopup("<b>Lat</b>: 45.76043<br><b>Long</b>: 4.835659");
+    var marker = L.marker([44.900002,4.96667], {icon: icon}).addTo(map)
+		.bindPopup("<b>Arrivée</b><br><b>Lat</b>: 45.76043<br><b>Long</b>: 4.835659");
 
     var firstpolyline = new L.Polyline(pointList, {
     color: 'grey',

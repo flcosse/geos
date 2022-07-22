@@ -137,10 +137,11 @@ from dash import dcc
 from dash import html
 from dash.dependencies import Input, Output
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP,])
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, ])
+app.title = "Générateur d'isochrone"
 server = app.server
 config = {"displayModeBar": False}
-loading_style = {'position': 'relative',"margin-left":"auto","margin-right":"auto","top":"40vh","z-index":"999"}
+loading_style = {'position': 'relative', "margin-left": "auto", "margin-right": "auto", "top": "40vh", "z-index": "999"}
 
 app.layout = html.Div(
     [
@@ -148,22 +149,36 @@ app.layout = html.Div(
             [
                 dcc.Loading(
                     id="loading",
-                    type="circle",
+                    type="default",
                     parent_style=loading_style,
                 ),
                 html.Div(
                     [
                         html.Label(
                             "Chercher une ville/adresse",
+                            style={
+                                "font-weight": "bold",
+                                "color": "dimgrey",
+                            },
                         ),
                         dcc.Input(
                             id="input1",
                             type="text",
-                            value="Lyon",
+                            value="Paris",
                             debounce=True,
                             style={"width": "100%"},
                         ),
                     ],
+                    style={
+                        "border": "0px solid rgba(255,255,255,1)",
+                        "background-color": "rgba(250,250,251,255)",
+                        "z-index": "999",
+                        "width": "15.5%",
+                        "position": "relative",
+                        "margin-top": "5%",
+                        "left": "4vh",
+                        "padding": "1vh",
+                    },
                 ),
                 html.Div(
                     [
@@ -177,14 +192,34 @@ app.layout = html.Div(
                                 {"label": " Vélo", "value": "cycling-regular"},
                                 {"label": " À pieds", "value": "foot-walking"},
                             ],
+                            style={
+                                "padding": "1vh",
+                                "width": "90%",
+                                "display": "inline-block"
+                            },
                             value="driving-car",
                         ),
                     ],
+                    style={
+                        "position": "relative",
+                        "z-index": "999",
+                        "background-color": "rgba(250,250,251,255)",
+                        "padding": "1vh",
+                        "margin-top": "1%",
+                        "width": "8%",
+                        "left": "4vh",
+                        "height": "30%",
+                    },
                 ),
                 html.Div(
                     [
                         html.Label(
                             "Isochrone",
+                            style={
+                                "padding-right": "1vh",
+                                "font-weight": "bold",
+                                "color": "dimgrey",
+                            },
                         ),
                         html.Br(),
                         html.Label("Incrémentation (min)"),
@@ -193,10 +228,26 @@ app.layout = html.Div(
                             type="number",
                             min=2,
                             max=11,
-                            value=10,
+                            value=6,
                             debounce=True,
+                            style={
+                                "width": "5.5vh",
+                                "text-align": "center",
+                                "margin-left": "1vh",
+                            },
                         ),
                     ],
+                    style={
+                        "border": "0px solid rgba(255,255,255,1)",
+                        "background-color": "rgba(250,250,251,255)",
+                        "z-index": "999",
+                        "max-width": "auto",
+                        "position": "relative",
+                        "left": "4vh",
+                        "margin-top": "1%",
+                        "padding": "1vh",
+                        "width": "fit-content",
+                    },
                 ),
                 html.Div(
                     [
@@ -219,6 +270,15 @@ app.layout = html.Div(
                             id="op",
                         ),
                     ],
+                    style={
+                        "z-index": "999",
+                        "position": "relative",
+                        "width": "15.5%",
+                        "left": "4vh",
+                        "margin-top": "1%",
+                        "background-color": "rgba(250,250,251,255)",
+                        "padding-left": "1vh",
+                    },
                 ),
             ]
         ),
@@ -226,6 +286,14 @@ app.layout = html.Div(
             [
                 dcc.Graph(
                     id="our_graph",
+                    style={
+                        "width": "100%",
+                        "height": "100vh",
+                        "top":"0",
+                        "left":"0",
+                        "position": "absolute",
+                        "display": "none"
+                    },
                     config=config,
                 ),
             ]
@@ -234,10 +302,10 @@ app.layout = html.Div(
 )
 
 
-
 @app.callback(
-    [    Output('our_graph','figure'),
-    Output('loading', 'parent_style')],
+    [Output('our_graph', 'figure'),
+     Output("our_graph", "style"),
+     Output('loading', 'parent_style')],
     [
         Input(component_id="input1", component_property="value"),
         Input(component_id="op", component_property="value"),
@@ -245,112 +313,124 @@ app.layout = html.Div(
         Input(component_id="input-radio-button", component_property="value"),
     ],
 )
-
-def iso(input1,op,inc,mode):
-        new_loading_style = loading_style
-        nom = input1
-        geolocator = Nominatim(user_agent="myapplication")
-        location = geolocator.geocode(nom)
-        text = [i for i in location]
-        coord = text[-1]
-        loc = [[coord[1], coord[0]]]
-        temp = [x for x in range(inc,60,inc)]
-        temp = temp[:5]
-        dist = [i * 60 for i in temp]
-        dist = sorted(dist)
-        body = {"locations": loc, "range": dist}
-        family = '-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif'
-        headers = {
+def iso(input1, op, inc, mode):
+    new_loading_style = loading_style
+    nom = input1
+    geolocator = Nominatim(user_agent="myapplication")
+    location = geolocator.geocode(nom)
+    text = [i for i in location]
+    coord = text[-1]
+    loc = [[coord[1], coord[0]]]
+    temp = [x for x in range(inc, 60, inc)]
+    temp = temp[:5]
+    dist = [i * 60 for i in temp]
+    dist = sorted(dist)
+    body = {"locations": loc, "range": dist}
+    family = '-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif'
+    headers = {
         'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
         'Authorization': '5b3ce3597851110001cf6248df22650771d94c06a73d6fb78ba4706b',
         'Content-Type': 'application/json; charset=utf-8'
-        }
-        call = requests.post(f'https://api.openrouteservice.org/v2/isochrones/{mode}', json=body, headers=headers)
-        call = call.json()
-        gdf = gpd.GeoDataFrame.from_features(call["features"])
+    }
+    call = requests.post(f'https://api.openrouteservice.org/v2/isochrones/{mode}', json=body, headers=headers)
+    call = call.json()
+    gdf = gpd.GeoDataFrame.from_features(call["features"])
 
-        for i, j in zip(range((len(dist) - 1), -1, -1), range((len(dist) - 2), -1, -1)):
-            gdf["geometry"][i] = gdf["geometry"][i].difference(gdf["geometry"][j])
-        val = gdf.to_json()
-        val = json.loads(val)
-        gdf["min"] = [i / 60 for i in gdf["value"]]
-        tok = open(".mapbox_token.txt").read()
-        color = [
-            "rgb(239,237,143)",
-            "rgb(213,221,119)",
-            "rgb(169,190,83)",
-            "rgb(124,165,62)",
-            "rgb(56,130,48)",
+    for i, j in zip(range((len(dist) - 1), -1, -1), range((len(dist) - 2), -1, -1)):
+        gdf["geometry"][i] = gdf["geometry"][i].difference(gdf["geometry"][j])
+    kek = gdf.to_json()
+    kek = json.loads(kek)
+    gdf["min"] = [i / 60 for i in gdf["value"]]
+    tok = open(".mapbox_token.txt").read()
+    color = [
+        "rgb(239,237,143)",
+        "rgb(213,221,119)",
+        "rgb(169,190,83)",
+        "rgb(124,165,62)",
+        "rgb(56,130,48)",
+    ]
+
+    fig = go.Figure(
+        data=[
+            go.Choroplethmapbox(
+                geojson=kek,
+                locations=gdf.index,
+                z=gdf["min"].astype(float),
+                colorscale=[
+                    [0, color[0]],
+                    [0.1, color[0]],
+                    [0.1, color[0]],
+                    [0.2, color[0]],
+                    [0.2, color[1]],
+                    [0.3, color[1]],
+                    [0.3, color[1]],
+                    [0.4, color[1]],
+                    [0.4, color[2]],
+                    [0.5, color[2]],
+                    [0.5, color[2]],
+                    [0.6, color[2]],
+                    [0.6, color[3]],
+                    [0.7, color[3]],
+                    [0.7, color[3]],
+                    [0.8, color[3]],
+                    [0.8, color[4]],
+                    [0.9, color[4]],
+                    [0.9, color[4]],
+                    [1.0, color[4]],
+                ],
+                colorbar=dict(tick0=0, dtick=inc),
+            )
         ]
+    )
+    lat = gdf["center"][0][1]
+    lon = gdf["center"][0][0]
 
-        fig = go.Figure(
-            data=[
-                go.Choroplethmapbox(
-                    geojson=val,
-                    locations=gdf.index,
-                    z=gdf["min"].astype(float),
-                    colorscale=[
-                        [0, color[0]],
-                        [0.1, color[0]],
-                        [0.1, color[0]],
-                        [0.2, color[0]],
-                        [0.2, color[1]],
-                        [0.3, color[1]],
-                        [0.3, color[1]],
-                        [0.4, color[1]],
-                        [0.4, color[2]],
-                        [0.5, color[2]],
-                        [0.5, color[2]],
-                        [0.6, color[2]],
-                        [0.6, color[3]],
-                        [0.7, color[3]],
-                        [0.7, color[3]],
-                        [0.8, color[3]],
-                        [0.8, color[4]],
-                        [0.9, color[4]],
-                        [0.9, color[4]],
-                        [1.0, color[4]],
-                    ],
-                    colorbar=dict(tick0=0, dtick=inc),
-                )
-            ]
-        )
-        lat = gdf["center"][0][1]
-        lon = gdf["center"][0][0]
+    fig.update_traces(
+        colorbar_len=0.25,
+        colorbar_orientation="v",
+        marker_opacity=op,
+        marker_line_color="dimgrey",
+        marker_line_width=0.3,
+        hoverinfo="none",
+        colorbar_thickness=20,
+        colorbar_y=0.2,
+        colorbar_x=0.02,
+        colorbar_outlinewidth=0,
+        colorbar_bgcolor="rgba(250,250,251,255)",
+        colorbar_tickfont=dict(family=family, size=11, color="gray"),
+        colorbar_title_side="top",
+        colorbar_title_text="<b>Trajets en<br>voiture (min.)",
+        colorbar_title_font=dict(family=family, color="rgb(100,100,100)", size=15),
+    )
+    fig.update_layout(
+        margin={"r": 0, "l": 0, "b": 0, "t": 0},
+        mapbox=dict(
+            center=dict(lat=lat, lon=lon),
+            accesstoken=tok,
+            zoom=9.2,
+            uirevision="oui",
+            style="mapbox://styles/mapbox/streets-v11",
+        ),
+        legend_itemdoubleclick=False,
+    )
 
-        fig.update_traces(
-            colorbar_len=0.25,
-            colorbar_orientation="v",
-            marker_opacity=op,
-            marker_line_color="dimgrey",
-            marker_line_width=0.3,
-            hoverinfo="none",
-            colorbar_thickness=20,
-            colorbar_y=0.2,
-            colorbar_x=0.02,
-            colorbar_outlinewidth=0,
-            colorbar_bgcolor="rgba(250,250,251,255)",
-            colorbar_tickfont=dict(family=family, size=11, color="gray"),
-            colorbar_title_side="top",
-            colorbar_title_text="<b>Trajets en<br>voiture (min.)",
-            colorbar_title_font=dict(family=family, color="rgb(100,100,100)", size=15),
-        )
-        fig.update_layout(legend_itemdoubleclick=False)
-        fig.update_layout(margin={"r": 0, "l": 0, "b": 0, "t": 0})
-        fig.update_layout(
-            mapbox=dict(
-                center=dict(lat=lat, lon=lon),
-                accesstoken=tok,
-                zoom=8.8,
-                uirevision="oui",
-                style="mapbox://styles/mapbox/streets-v11"
-            ),
-        )
-        return fig,new_loading_style
+    return (
+        fig,
+        {
+            "width": "100%",
+            "height": "100vh",
+            "top": "0",
+            "left": "0",
+            "position": "absolute",
+            "display": "inline",
+        },
+        new_loading_style,
+    )
 
 
 if __name__ == '__main__':
-        app.run_server(debug=False)
+    app.run_server(debug=False)
+
 </code></pre>
 <br>
 

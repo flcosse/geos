@@ -117,23 +117,19 @@ from dash.dependencies import Input, Output
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
-
+style = {
+    "width": "40%",
+    "height": "35vh",
+    "float": "left",
+    "padding": "1vh",
+    "filter": "drop-shadow(0 0 0.05rem grey)",
+}
+font = "-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif"
 gdf = pd.read_csv(
     "https://raw.githubusercontent.com/dbouquin/IS_608/master/NanosatDB_munging/Countries-Continents.csv"
 )
-df = pd.read_csv("https://raw.githubusercontent.com/flcosse/script/main/global_power_plant_database.csv")
-df = df.rename(
-    columns={
-        "country_long": "Country",
-    }
-)
-ce = pd.read_csv("https://raw.githubusercontent.com/flcosse/script/main/countries.csv")
-df = pd.merge(df, gdf, on="Country", how="outer")
-
-df = df[df["Continent"] == "Europe"]
-df = df[
-    [
-        "Country",
+fields = [
+        "country_long",
         "name",
         "capacity_mw",
         "latitude",
@@ -141,8 +137,18 @@ df = df[
         "primary_fuel",
         "estimated_generation_gwh_2017",
     ]
-]
+df = pd.read_csv(
+    "https://raw.githubusercontent.com/flcosse/script/main/global_power_plant_database.csv",
+    usecols=fields,
 
+)
+df = df.rename(
+    columns={
+        "country_long": "Country",
+    }
+)
+ce = pd.read_csv("https://raw.githubusercontent.com/flcosse/script/main/countries.csv")
+df = pd.merge(df, gdf, on="Country", how="outer")
 df = df.rename(
     columns={
         "primary_fuel": "Origine",
@@ -181,18 +187,17 @@ df["Origine"] = df["Origine"].replace(
 
 c = {
     "Biomasse": "#c68c53",
-    "Charbon": "#333333",
-    "Biogaz": "#cc00cc",
-    "Eolienne": "#39ac73",
-    "Gaz": "hotpink",
-    "Hydraulique": "#0066ff",
-    "Nucléaire": "#ff3333",
-    "Fioul": "#804000",
-    "Solaire": "#ffd11a",
+    "Charbon": "#79706e",
+    "Biogaz": "#ff9da7",
+    "Eolienne": "#86bcb6",
+    "Gaz": "#d4a6c8",
+    "Hydraulique": "#4e79a7",
+    "Nucléaire": "#e15759",
+    "Fioul": "#b6992d",
+    "Solaire": "#f1ce63",
     "Autre": "dimgray",
     "Stockage": "purple",
 }
-
 
 
 SIDEBAR_STYLE = {
@@ -214,7 +219,6 @@ CONTENT_STYLE = {
 sidebar = html.Div(
     [
         html.H2("Europe", className="display-4"),
-        html.Hr(),
         html.P(
             "Données sur l'énergie Source : World Ressource Institute", className="lead"
         ),
@@ -229,159 +233,127 @@ sidebar = html.Div(
     ],
     style=SIDEBAR_STYLE,
 )
+liste = [
+    "France",
+    "Germany",
+    "United Kingdom",
+    "Italy",
+    "Spain",
+    "Japan",
+    "India",
+    "China",
+    "Russia",
+]
+liste2 = [
+    "France",
+    "Allemagne",
+    "Royaume-Uni",
+    "Italie",
+    "Espagne",
+    "Japon",
+    "Inde",
+    "Chine",
+    "Russie",
+]
+OptionList = [{"label": j, "value": i} for i, j in zip(liste, liste2)]
 
 content = html.Div(id="page-content", children=[], style=CONTENT_STYLE)
 
-app.layout = html.Div([dcc.Location(id="url"), sidebar, content])
 config = {"displayModeBar": False}
-
-
-@app.callback(Output("page-content", "children"), [Input("url", "pathname")])
-def render_page_content(pathname):
-    if pathname == "/":
-        return [
-            html.Div(
-                [
-                    dcc.Dropdown(
-                        id="my_checklist",
-                        options=[
-                            {"label": "Charbon", "value": "Charbon"},
-                            {"label": "Eolienne", "value": "Eolienne"},
-                            {"label": "Gaz", "value": "Gaz"},
-                            {"label": "Hydraulique", "value": "Hydraulique"},
-                            {"label": "Nucléaire", "value": "Nucléaire"},
-                            {"label": "Fioul", "value": "Fioul"},
-                            {"label": "Solaire", "value": "Solaire"},
-                        ],
-                        value=["Charbon"],
-                        multi=True,
-                        clearable=False,
-                    ),
-                    html.Div(
-                        [
-                            html.Div(
-                                [
-                                    dcc.Graph(
-                                        id="the_graph",
-                                        style={"height": "87vh"},
-                                        config=config,
-                                    )
-                                ]
-                            ),
-                        ]
-                    ),
-                ]
-            ),
-        ]
-    elif pathname == "/nation":
-        return [
-            html.Div(
-                [
-                    dcc.Dropdown(
-                        id="slct_year",
-                        options=[
-                            {"label": "France", "value": "France"},
-                            {"label": "Allemagne", "value": "Germany"},
-                            {"label": "Espagne", "value": "Spain"},
-                            {"label": "Italie", "value": "Italy"},
-                            {"label": "Portugal", "value": "Portugal"},
-                        ],
-                        value="France",
-                        multi=False,
-                        clearable=False,
-                    ),
-                    html.Div(
-                        [
-                            dcc.Graph(
-                                id="graph3",
-                                figure=[],
-                                style={
-                                    "height": "90vh",
-                                    "top": "7vh",
-                                },
-                                config=config,
-                            ),
-                        ]
-                    ),
-                    html.Hr(),
-                    html.Div(
-                        [
-                            dcc.Graph(
-                                id="graph1",
-                                figure=[],
-                                config=config,
-                            ),
-                        ]
-                    ),
-                    html.Div(
-                        [
-                            dcc.Graph(
-                                id="graph4",
-                                figure=[],
-                                config=config,
-                            ),
-                        ]
-                    ),
-                    html.Div(
-                        [
-                            dcc.Graph(
-                                id="graph2",
-                                figure=[],
-                                config=config,
-                            ),
-                        ]
-                    ),
-                    html.Div(
-                        [
-                            dcc.Graph(
-                                id="graph5",
-                                figure=[],
-                                config=config,
-                            ),
-                        ]
-                    ),
-                ]
-            ),
-        ]
-
-
-@app.callback(
-    Output(component_id="the_graph", component_property="figure"),
-    [Input(component_id="my_checklist", component_property="value")],
-)
-def update_graph(options_chosen):
-    dff = df.copy()
-    dff = dff[dff["Origine"].isin(options_chosen)]
-    dff["Génération estimée (gwh)"] = dff["Génération estimée (gwh)"].fillna(0)
-    px.set_mapbox_access_token(open(".mapbox_token.txt").read())
-    fig = px.scatter_mapbox(
-        dff,
-        lat=dff["latitude"],
-        lon=dff["longitude"],
-        color=dff["Origine"],
-        size=dff["Génération estimée (gwh)"],
-        size_max=30,
-        zoom=3,
-        color_discrete_map=c,
-        custom_data=["Origine", "Génération estimée (gwh)", "name"],
-        title="Sites de production d'électricité par type d'énergie",
-        mapbox_style="light",
-        center={"lat": 48.4889191993939, "lon": 16.793357414739376},
-    )
-    fig.update_traces(
-        hovertemplate="<br>".join(
+app.layout = html.Div(
+    [
+        html.Div(
             [
-                "Y : %{lat:.2f}",
-                "X : %{lon:.2f}",
-                "Génération : %{customdata[1]:.0f} GWh",
-                "Nom : %{customdata[2]}",
+                dcc.Dropdown(
+                    id="slct_year",
+                    options=OptionList,
+                    value="France",
+                    multi=False,
+                    clearable=False,
+                    searchable=True,
+                    style={
+                        "width": "20vh",
+                        "top": "1vh",
+                        "left": "1vh",
+                        "position": "fixed",
+                        "z-index": "9",
+                        "border-radius": "0px",
+                        "filter": "drop-shadow(0 0 0.02rem grey)",
+                    },
+                ),
+                html.Div(
+                    [
+                        dcc.Graph(
+                            id="graph3",
+                            figure=[],
+                            style={
+                                "height": "70vh",
+                                "width": "60%",
+                                "top": "7vh",
+                                "float": "left",
+                                "padding": "1vh",
+
+                            },
+                            config=config,
+                        ),
+                    ]
+                ),
+                html.Div(
+                    [
+                        dcc.Graph(
+                            id="graph1",
+                            figure=[],
+                            style=style,
+                            config=config,
+                        ),
+                    ]
+                ),
+                html.Div(
+                    [
+                        dcc.Graph(
+                            id="graph4",
+                            figure=[],
+                            style=style,
+                            config=config,
+                        ),
+                    ]
+                ),
+                html.Div(
+                    [
+                        dcc.Graph(
+                            id="graph2",
+                            figure=[],
+                            style={
+                                "width": "50%",
+                                "height": "30vh",
+                                "float": "left",
+                                "padding": "1vh",
+                                "filter": "drop-shadow(0 0 0.05rem grey)",
+                            },
+                            config=config,
+                        ),
+                    ]
+                ),
+                html.Div(
+                    [
+                        dcc.Graph(
+                            id="graph5",
+                            figure=[],
+                            style={
+                                "width": "50%",
+                                "height": "30vh",
+                                "float": "left",
+                                "padding": "1vh",
+                                "filter": "drop-shadow(0 0 0.05rem grey)",
+                            },
+                            config=config,
+                        ),
+                    ]
+                ),
             ]
-        )
-    )
-    fig.update_layout(legend=dict(yanchor="top", y=1, xanchor="left", x=0, bgcolor='rgba(250,250,250,.8)'))
-    fig.update_layout(margin={"r": 0, "l": 0, "b": 0, "t": 30})
-    fig.update_layout(legend_itemdoubleclick=False)
-    return fig
+        ),
+    ]
+)
 
 
 @app.callback(
@@ -400,7 +372,7 @@ def update_graph(option_slctd):
     for i in dff["Origine"]:
         if i == "Nucléaire":
             source.append("Nucléaire")
-        elif i in ("Gaz", "Pétrole", "Charbon"):
+        elif i in ("Gaz", "Fioul", "Charbon"):
             source.append("Traditionnelles")
         else:
             source.append("Renouvelables")
@@ -414,23 +386,31 @@ def update_graph(option_slctd):
         title="Mix selon les capacités maximales de production",
         orientation="v",
     )
-    fig.update_layout(
-        xaxis_title="capacity_mw",
-    )
-    fig.update_layout(yaxis_title="", xaxis_title="Sources")
-    fig.update_traces(hovertemplate="<b>%{y:.0f}%")
-    fig.update_layout(margin={"r": 0, "l": 0, "b": 0, "t": 45})
+
     fig.update_layout(
         {
             "plot_bgcolor": "rgb(248, 249, 250)",
             "paper_bgcolor": "rgb(248, 249, 250)",
-        }
+        },
+        legend_itemdoubleclick=False,
+        margin={"r": 0, "l": 0, "b": 0, "t": 45},
+        yaxis_title="",
+        xaxis_title="Sources",
+        font=dict(
+            size=10,
+        ),
+        hoverlabel=dict(
+            bgcolor="rgba(250,250,250,0.8)", font_size=13, font_family=font
+        ),
     )
+
     fig.layout.xaxis.fixedrange = True
     fig.layout.yaxis.fixedrange = True
-    fig.update_yaxes(zeroline=True, zerolinewidth=1, zerolinecolor='lightgray')
+    fig.update_yaxes(zeroline=True, zerolinewidth=1, zerolinecolor="lightgray")
     fig.update_yaxes(showgrid=True, gridwidth=0.2, gridcolor="lightgray")
-    fig.update_layout(legend_itemdoubleclick=False)
+    fig.update_traces(
+        hovertemplate="<extra></extra><b>Source</b> : %{x}<br><b>Part dans le mix</b> : %{y}%"
+    )
     return fig
 
 
@@ -444,13 +424,16 @@ def update_graph(option_slctd):
     dff = dff.dropna()
     dff = dff[dff["Country"] == option_slctd]
     dff = dff.groupby(["Origine"]).sum("Génération estimée (gwh)").reset_index()
-    perc = [(i / sum(dff["Génération estimée (gwh)"]) * 100) for i in dff["Génération estimée (gwh)"]]
+    perc = [
+        (i / sum(dff["Génération estimée (gwh)"]) * 100)
+        for i in dff["Génération estimée (gwh)"]
+    ]
     dff["Pourcentage"] = perc
     dff["Pourcentage"] = dff["Pourcentage"].astype(int)
     for i in dff["Origine"]:
         if i == "Nucléaire":
             source.append("Nucléaire")
-        elif i in ("Gaz", "Pétrole", "Charbon"):
+        elif i in ("Gaz", "Fioul", "Charbon"):
             source.append("Traditionnelles")
         else:
             source.append("Renouvelables")
@@ -464,23 +447,31 @@ def update_graph(option_slctd):
         title="Mix énergétique du pays (2017)",
         orientation="v",
     )
-    fig.update_layout(
-        xaxis_title="Génération (GWh)",
-    )
-    fig.update_layout(yaxis_title="", xaxis_title="Sources")
-    fig.update_traces(hovertemplate="<b>%{y:.0f}%")
-    fig.update_layout(margin={"r": 0, "l": 0, "b": 0, "t": 45})
+
     fig.update_layout(
         {
             "plot_bgcolor": "rgb(248, 249, 250)",
             "paper_bgcolor": "rgb(248, 249, 250)",
-        }
+        },
+        yaxis_title="",
+        xaxis_title="Sources",
+        font=dict(
+            size=10,
+        ),
+        margin={"r": 0, "l": 0, "b": 0, "t": 45},
+        legend_itemdoubleclick=False,
+        hoverlabel=dict(
+            bgcolor="rgba(250,250,250,0.8)", font_size=13, font_family=font
+        ),
     )
     fig.layout.xaxis.fixedrange = True
     fig.layout.yaxis.fixedrange = True
-    fig.update_yaxes(zeroline=True, zerolinewidth=1, zerolinecolor='lightgray')
+    fig.update_yaxes(zeroline=True, zerolinewidth=1, zerolinecolor="lightgray")
     fig.update_yaxes(showgrid=True, gridwidth=0.2, gridcolor="lightgray")
-    fig.update_layout(legend_itemdoubleclick=False)
+    fig.update_traces(
+        hovertemplate="<extra></extra><b>Source</b> : %{x}<br><b>Part dans le mix</b> : %{y}%"
+    )
+
     return fig
 
 
@@ -504,31 +495,33 @@ def plot(pays):
         custom_data=["Origine", "Génération estimée (gwh)", "name"],
         log_y=True,
     )
-    fig.update_layout(
-        yaxis_title="Génération (GWh)",
-    )
     fig.update_traces(
-        hovertemplate="<br>".join(
+        hovertemplate="".join(
             [
-                "Rang : %{x}",
-                "Génération : %{y:.2f} GWh",
-                "Nom : %{customdata[2]}",
+                "<extra></extra><b>Rang</b> : %{x}<br><b>GWh générés</b> : %{y}<br><b>Origine</b> : %{customdata[0]}",
             ]
         )
     )
-    fig.update_layout(margin={"r": 0, "l": 0, "b": 0, "t": 45})
+    fig.update_yaxes(showgrid=True, gridwidth=0.1, gridcolor="lightgray")
+    fig.update_xaxes(zeroline=True, zerolinewidth=1, zerolinecolor="lightgray")
+    fig.layout.xaxis.fixedrange = True
+    fig.layout.yaxis.fixedrange = True
     fig.update_layout(
         {
             "plot_bgcolor": "rgb(248, 249, 250)",
             "paper_bgcolor": "rgb(248, 249, 250)",
-        }
+        },
+        yaxis_title="Génération (GWh)",
+        legend_itemdoubleclick=False,
+        font=dict(
+            size=10,
+        ),
+        hoverlabel=dict(
+            bgcolor="rgba(250,250,250,0.8)", font_size=13, font_family=font
+        ),
+        margin={"r": 0, "l": 0, "b": 0, "t": 45},
     )
-    fig.update_xaxes(showgrid=True, gridwidth=0.1, gridcolor="lightgray")
-    fig.update_yaxes(showgrid=True, gridwidth=0.1, gridcolor="lightgray")
-    fig.update_xaxes(zeroline=True, zerolinewidth=1, zerolinecolor='lightgray')
-    fig.layout.xaxis.fixedrange = True
-    fig.layout.yaxis.fixedrange = True
-    fig.update_layout(legend_itemdoubleclick=False)
+
     return fig
 
 
@@ -542,32 +535,39 @@ def carto(pays):
     dff = dff.dropna()
     dff = dff[dff["Country"] == pays]
     centroid = ce.copy()
-    centroid = centroid[centroid["name"]==pays]
+    centroid = centroid[centroid["name"] == pays]
     fig = px.scatter_mapbox(
         dff,
         lat=dff["latitude"],
         lon=dff["longitude"],
         color=dff["Origine"],
         size=dff["Génération estimée (gwh)"],
-        size_max=50,
-        zoom=5,
+        size_max=30,
+        zoom=4,
         color_discrete_map=c,
         custom_data=["Origine", "Génération estimée (gwh)", "name"],
-        title="Localisation des unités de production",
         mapbox_style="light",
-        center={"lat":centroid["latitude"].values[0], "lon":centroid["longitude"].values[0] },
+        center={
+            "lat": centroid["latitude"].values[0],
+            "lon": centroid["longitude"].values[0],
+        },
     )
     fig.update_traces(
-        hovertemplate="<br>".join(
+        hovertemplate="".join(
             [
-                "Génération : %{customdata[1]:.0f} GWh",
-                "Nom : %{customdata[2]}",
+                "<extra></extra><b>Génération</b> : %{customdata[1]:.0f} GWh<br><b>Nom</b> : %{customdata[2]}",
             ]
         )
     )
-    fig.update_layout(legend=dict(yanchor="top", y=1, xanchor="left", x=0, bgcolor='rgba(250,250,250,.8)'))
-    fig.update_layout(margin={"r": 0, "l": 0, "b": 0, "t": 60})
-    fig.update_layout(legend_itemdoubleclick=False)
+
+    fig.update_layout(
+        hoverlabel=dict(
+            bgcolor="rgba(250,250,250,0.8)", font_size=13, font_family=font
+        ),
+        legend_itemdoubleclick=False,
+        margin={"r": 0, "l": 0, "b": 0, "t": 0},
+        legend=dict(y=1, xanchor="right", x=1, bgcolor="rgba(250,250,250,.8)"),
+    )
     return fig
 
 
@@ -587,22 +587,32 @@ def prop(pays):
         color_discrete_map=c,
         title="Nombre d'unités de production par type",
     )
-    fig.update_layout(margin={"r": 0, "l": 0, "b": 0, "t": 45})
-    fig.update_traces(hovertemplate="%{label} : %{value} (%{percent})")
-    fig.update_traces(textinfo="value")
+    fig.update_traces(
+        hovertemplate="%{label} : %{value} (%{percent})", textinfo="value"
+    )
     fig.update_layout(
         {
             "plot_bgcolor": "rgb(248, 249, 250)",
             "paper_bgcolor": "rgb(248, 249, 250)",
-        }
+        },
+        margin={"r": 0, "l": 0, "b": 0, "t": 45},
+        legend_itemdoubleclick=False,
+        font=dict(
+            size=10,
+        ),
+        hoverlabel=dict(
+            bgcolor="rgba(250,250,250,0.8)", font_size=13, font_family=font
+        ),
     )
-    fig.update_layout(legend_itemdoubleclick=False)
+    fig.update_traces(
+        hovertemplate="<extra></extra><b>Source</b> : %{label}<br><b>Nombre d'unites</b> : %{value}"
+    )
+
     return fig
 
 
 if __name__ == "__main__":
     app.run_server(debug=False)
-
 </code></pre>
             <br>
             <!-- End Post Content -->

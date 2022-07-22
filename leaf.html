@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ==" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js" integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ==" crossorigin=""></script>
+	<script src="/LIBLEAF/leaflet-measure.js"></script>
 
 	<style>
 
@@ -57,8 +58,8 @@ var pointB = new L.LatLng(44.900002,4.96667);
 var pointList = [pointA, pointB];
 
 
-	var map = L.map('map').setView([44.90015,4.89161], 12);
-
+	var map = L.map('map').setView([44.90015,4.89161], 12,);
+	
 	var Thunderforest_Landscape = L.tileLayer('https://{s}.tile.thunderforest.com/landscape/{z}/{x}/{y}.png?apikey={apikey}', {
 	attribution: '&copy; <a href="http://www.thunderforest.com/">Thunderforest</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 	apikey: '77cc7e80b73c48ba8c3e4c6c22c16cb8',
@@ -70,15 +71,17 @@ var pointList = [pointA, pointB];
 
     var marker = L.marker([44.900002,4.96667], {icon: icon}).addTo(map)
 		.bindPopup("<b>Arrivée</b><br><b>Lat</b>: 44.900002<br><b>Long</b>: 4.96667");
+	
+
 
     var firstpolyline = new L.Polyline(pointList, {
     color: 'grey',
     weight: 3,
     opacity: 0.9,
     smoothFactor: 1
-})
-firstpolyline.addTo(map)
-.bindPopup("<b>Longueur</b> : 11,8km<br><b>Dénvilé</b> : -69m");
+	});firstpolyline.addTo(map).bindPopup("<b>Longueur</b> : 11,8km<br><b>Dénvilé</b> : -69m");
+
+
 
 	map.on('click', onMapClick);
 

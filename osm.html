@@ -112,15 +112,11 @@ import osmnx as ox
 import plotly.express as px
 
 def diag(input1):
-    print("oui")
     place_name = input1
     tags = {'landuse': True}
     land = ox.geometries_from_place(place_name, tags)
-    print("oui")
     land = land.to_crs("epsg:2154")
-    print("oui")
     limite = gpd.read_file(r"C:\Users\Florian\Desktop\département\COMMUNE.SHP")
-    print("oui")
     limite = limite[limite["NOM_COM"] == place_name]
     land = land.clip(limite)
     land["surface"] = land.area

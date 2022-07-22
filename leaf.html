@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	
+	<title>Situation profil topographique</title>
+	
+	<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css" integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ==" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js" integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ==" crossorigin=""></script>
+
+	<style>
+
+		.leaflet-container {
+			height: 400px;
+			width: 600px;
+			max-width: 100%;
+			max-height: 100%;
+		}
+        .leaflet-popup-content-wrapper {
+	padding: 1px;
+	text-align: "left";
+	border-radius: 3px;
+    background-color: rgba(250,250,250,0.9);
+	}
+	</style>
+
+	
+</head>
+<body>
+
+
+
+<div id="map" style="width: 200vh; height: 98vh;"></div>
+<script>
+    const fontAwesomeIcon = L.divIcon({
+    html: '<i class="fa fa-map-marker fa-4x"></i>',
+    iconSize: [20, 20],
+    className: 'myDivIcon'
+});
+var icon = L.icon({
+    iconUrl: 'gps.png',
+    iconSize:     [30,30], 
+    popupAnchor:  [0, 0] 
+});
+
+var icon2 = L.icon({
+    iconUrl: 'gps1.png',
+    iconSize:     [30,30], 
+    popupAnchor:  [0, 0] 
+});
+var pointA = new L.LatLng(45.3991, 4.559);
+var pointB = new L.LatLng(45.76043, 4.835659);
+var pointList = [pointA, pointB];
+
+
+	var map = L.map('map').setView([45.583328, 4.76667], 9);
+
+	var Thunderforest_Landscape = L.tileLayer('https://{s}.tile.thunderforest.com/landscape/{z}/{x}/{y}.png?apikey={apikey}', {
+	attribution: '&copy; <a href="http://www.thunderforest.com/">Thunderforest</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+	apikey: '77cc7e80b73c48ba8c3e4c6c22c16cb8',
+	maxZoom: 22
+}).addTo(map);
+
+	var marker = L.marker([45.3991, 4.559], {icon: icon2}).addTo(map)
+		.bindPopup("<b>Lat</b>: 45.3991<br><b>Long</b>: 4.559");
+
+    var marker = L.marker([45.76043, 4.835659], {icon: icon}).addTo(map)
+		.bindPopup("<b>Lat</b>: 45.76043<br><b>Long</b>: 4.835659");
+
+    var firstpolyline = new L.Polyline(pointList, {
+    color: 'grey',
+    weight: 3,
+    opacity: 0.9,
+    smoothFactor: 1
+})
+firstpolyline.addTo(map)
+.bindPopup("<b>Longueur</b> : 45,5km<br><b>Dénvilé</b> : -916m");
+
+	map.on('click', onMapClick);
+
+
+</script>
+
+
+
+</body>
+</html>

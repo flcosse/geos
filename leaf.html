@@ -67,10 +67,14 @@ var pointList = [pointA, pointB];
 }).addTo(map);
 
 	var marker = L.marker([44.900002,4.81667], {icon: icon2}).addTo(map)
-		.bindPopup("<b>Départ</b><br><b>Lat</b>: 44.900002<br><b>Long</b>: 4.81667");
+		.bindTooltip("<b>Départ</b><br><b>Lat</b>: 44.900002<br><b>Long</b>: 4.81667",{
+	sticky: true
+});
 
     var marker = L.marker([44.900002,4.96667], {icon: icon}).addTo(map)
-		.bindPopup("<b>Arrivée</b><br><b>Lat</b>: 44.900002<br><b>Long</b>: 4.96667");
+		.bindTooltip("<b>Arrivée</b><br><b>Lat</b>: 44.900002<br><b>Long</b>: 4.96667",{
+	sticky: true
+});
 	
 
 
@@ -79,7 +83,9 @@ var pointList = [pointA, pointB];
     weight: 3,
     opacity: 0.9,
     smoothFactor: 1
-	});firstpolyline.addTo(map).bindPopup("<b>Longueur</b> : 11,8km<br><b>Dénvilé</b> : -69m");
+	});firstpolyline.addTo(map).bindTooltip("<b>Longueur</b> : 11,8km<br><b>Dénvilé</b> : -69m",{
+	sticky: true
+});
 
 
 

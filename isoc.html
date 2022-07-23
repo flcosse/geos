@@ -129,6 +129,7 @@ La librairie Nominatim renvoie les coordonnées d'une ville. Ces coordonnées se
 				<pre><code class="python">import requests
 import geopandas as gpd
 from geopy.geocoders import Nominatim
+import plotly.express as px
 import plotly.graph_objects as go
 import json
 import dash_bootstrap_components as dbc
@@ -136,6 +137,7 @@ import dash
 from dash import dcc
 from dash import html
 from dash.dependencies import Input, Output
+import osmnx as ox
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, ])
 app.title = "Générateur d'isochrone"
@@ -164,7 +166,7 @@ app.layout = html.Div(
                         dcc.Input(
                             id="input1",
                             type="text",
-                            value="Paris",
+                            value="Pontacq",
                             debounce=True,
                             style={"width": "100%"},
                         ),
@@ -228,7 +230,7 @@ app.layout = html.Div(
                             type="number",
                             min=2,
                             max=11,
-                            value=6,
+                            value=10,
                             debounce=True,
                             style={
                                 "width": "5.5vh",
@@ -255,7 +257,7 @@ app.layout = html.Div(
                             "Opacité", style={"font-weight": "bold", "color": "dimgrey"}
                         ),
                         dcc.Slider(
-                            value=1,
+                            value=0.6,
                             step=0.2,
                             min=0,
                             max=1,
@@ -287,10 +289,23 @@ app.layout = html.Div(
                 dcc.Graph(
                     id="our_graph",
                     style={
+                        "display": "none",
                         "width": "100%",
                         "height": "100vh",
                         "top":"0",
                         "left":"0",
+                        "position": "absolute",
+                    },
+                    config=config,
+                ),
+                dcc.Graph(
+                    id="info",
+                    style={
+                        "display": "none",
+                        "width": "15%",
+                        "height": "30vh",
+                        "bottom":"5%",
+                        "right":"4%",
                         "position": "absolute",
                         "display": "none"
                     },
@@ -305,7 +320,9 @@ app.layout = html.Div(
 @app.callback(
     [Output('our_graph', 'figure'),
      Output("our_graph", "style"),
-     Output('loading', 'parent_style')],
+     Output('loading', 'parent_style'),
+     Output('info', 'figure'),
+     Output("info", "style")],
     [
         Input(component_id="input1", component_property="value"),
         Input(component_id="op", component_property="value"),
@@ -335,6 +352,39 @@ def iso(input1, op, inc, mode):
     call = requests.post(f'https://api.openrouteservice.org/v2/isochrones/{mode}', json=body, headers=headers)
     call = call.json()
     gdf = gpd.GeoDataFrame.from_features(call["features"])
+    data = gdf.iloc[0]["geometry"]
+    tags = {'shop': ["general","department_store","mall","supermarket","wholesale"]}
+    comm = ox.geometries_from_polygon(data, tags)
+    tags2 = {"amenity":["bar", "restaurant"]}
+    bar = ox.geometries_from_polygon(data, tags2)
+    tags3 = {"amenity": ["school","university","college"]}
+    school = ox.geometries_from_polygon(data, tags3)
+    x = ["Supermarchés","Restaurants","Ecoles"]
+    y = [len(comm),len(bar),len(school)]
+    info = px.bar(x=x, y=y,color_discrete_sequence=["#e15759","#e15759","#e15759"],title="<b>Services à proximité</b><br><sup>Source : OSM</sup>",)
+    info.update_layout(
+        {
+            "plot_bgcolor": "rgba(255,255,255,0)",
+            "paper_bgcolor": "rgba(255,255,255,0.7)",
+        },
+    margin={"r": 5, "l": 5, "b": 5, "t": 30},
+    showlegend=False,
+    font=dict(size=11,
+              family="-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif"),
+        title_font_family="-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif",
+        title_x=0.5,
+
+    )
+    info.update_traces(hovertemplate="<br>".join([
+            "%{y} %{x}"
+        ]))
+    info.update_yaxes(title='y', visible=False, showticklabels=False)
+    info.update_xaxes(title=None, visible=True, showticklabels=True)
+    legend_itemdoubleclick = False
+    info.layout.xaxis.fixedrange = True
+    info.layout.yaxis.fixedrange = True
+    info.update_yaxes(zeroline=False,)
+    info.update_yaxes(showgrid=False)
 
     for i, j in zip(range((len(dist) - 1), -1, -1), range((len(dist) - 2), -1, -1)):
         gdf["geometry"][i] = gdf["geometry"][i].difference(gdf["geometry"][j])
@@ -425,12 +475,20 @@ def iso(input1, op, inc, mode):
             "display": "inline",
         },
         new_loading_style,
+        info,
+        {
+            "width": "15%",
+            "height": "30vh",
+            "bottom": "7%",
+            "right": "4%",
+            "position": "absolute",
+            "display": "inline"
+        }
     )
 
 
 if __name__ == '__main__':
     app.run_server(debug=False)
-
 </code></pre>
 <br>
 

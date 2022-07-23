@@ -43,14 +43,16 @@
     className: 'myDivIcon'
 });
 var icon = L.icon({
-    iconUrl: 'record.png',
-    iconSize: [15, 15],
-    popupAnchor: [0, 0]
+    iconUrl: 'marker.png',
+    iconSize: [20, 20],
+    iconAnchor: [8, 19],
+    popupAnchor: [0, 10]
 });
 
 var icon2 = L.icon({
-    iconUrl: 'record1.png',
-    iconSize: [15, 15],
+    iconUrl: 'marker.png',
+    iconSize: [20, 20],
+    iconAnchor: [10,20],
     popupAnchor: [0, 0]
 });
 var pointA = new L.LatLng(44.900002, 4.81667);
@@ -83,7 +85,7 @@ var marker = L.marker([44.900002, 4.96667], {
 
 
 var firstpolyline = new L.Polyline(pointList, {
-    color: 'grey',
+    color: 'rgb(27, 112, 204)',
     weight: 3,
     opacity: 0.9,
     smoothFactor: 1

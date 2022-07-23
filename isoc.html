@@ -138,6 +138,8 @@ from dash import dcc
 from dash import html
 from dash.dependencies import Input, Output
 import osmnx as ox
+import os
+import flask
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, ])
 app.title = "Générateur d'isochrone"
@@ -153,6 +155,7 @@ app.layout = html.Div(
                     id="loading",
                     type="default",
                     parent_style=loading_style,
+                    color="#75cff0"
                 ),
                 html.Div(
                     [
@@ -316,7 +319,6 @@ app.layout = html.Div(
     ]
 )
 
-
 @app.callback(
     [Output('our_graph', 'figure'),
      Output("our_graph", "style"),
@@ -373,8 +375,10 @@ def iso(input1, op, inc, mode):
               family="-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif"),
         title_font_family="-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif",
         title_x=0.5,
-
-    )
+        hoverlabel=dict(
+            bgcolor="rgba(255,255,255,0.8)",
+        )
+        )
     info.update_traces(hovertemplate="<br>".join([
             "%{y} %{x}"
         ]))

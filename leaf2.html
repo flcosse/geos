@@ -1,0 +1,50 @@
+<html>
+	<head>
+		<title>Coordonnées Leaflet</title>
+		<meta charset="utf-8">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
+        integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
+        crossorigin=""/>
+         <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
+   integrity="sha512-BB3hKbKWOc9Ez/TAwyWxNXeoV9c1v6FIeYiBieIWkpLjauysF18NzgR1MBNBXf8/KABdlkX68nAhlwcDFLGPCQ=="
+   crossorigin=""></script>
+		<link rel="stylesheet" href="https://d19vzq90twjlae.cloudfront.net/leaflet/v0.7.7/leaflet.css" />
+		<script src="https://d19vzq90twjlae.cloudfront.net/leaflet/v0.7.7/leaflet.js"></script>
+		<style type="text/css">
+		 	html, body, #map{
+		 		height: 100%;
+		 		padding: 0;
+		 		margin: 0;
+		 	}
+			 .leaflet-popup-content-wrapper{
+				border-radius: 3px !important;
+				background-color: rgba(255,255,255,0.9);
+			 }
+		</style>
+	</head>
+	<body>
+		<div id="map"></div>
+        <script type="text/javascript" src="us-states.js"></script>
+		<script type="text/javascript">
+var map = L.map('map').setView([44.7904, 4.8065], 8, );
+
+var Thunderforest_Landscape = L.tileLayer('https://{s}.tile.thunderforest.com/landscape/{z}/{x}/{y}.png?apikey={apikey}', {
+    attribution: '&copy; <a href="http://www.thunderforest.com/">Thunderforest</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    apikey: '77cc7e80b73c48ba8c3e4c6c22c16cb8',
+    maxZoom: 22
+}).addTo(map);
+
+map.on('click', function(e){
+  var lt = String(e.latlng.lat.toFixed(4)	),
+  lg = String(e.latlng.lng.toFixed(4));
+  var popup = L.popup()
+    .setLatLng(e.latlng)
+    .setContent(lt + ", " + lg)
+    .openOn(map);
+});
+
+var geojson = L.geoJson(statesData).addTo(map);
+
+		</script>
+	</body>
+</html>

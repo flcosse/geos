@@ -100,7 +100,7 @@
             <p>
                 Un MNT (Modèle Numérique de Terrain) est importé par le script. Différentes opérations comme des jointures ou des prélèvements de valeurs rasters interviendront pour collecter les données nécessaires à la réalisation du profil.<br>Les paramètres comme les noms des villes, l'altitude et la distance sont stockés dans des listes qui serviront à générer automatiquement le graphique avec Plotly.
             </p>
-			<iframe src="https://flcosse.github.io/script/profil.html"scrolling="no"frameBorder="0" height="40%" width="100%"  title=""></iframe>
+			<iframe src="https://dash-topo.herokuapp.com/"scrolling="no"frameBorder="0" height="40%" width="100%"  title=""></iframe>
             <iframe src="leaf2.html"scrolling="no"frameBorder="0" height="30%" width="100%"  title=""></iframe>
             <br><br>
     
@@ -109,22 +109,81 @@
 			<!-- Begin Post Content -->
 
 				<pre><code class="python">import geopandas as gpd
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import rasterio
 from pyproj import Geod
-from rasterio.plot import show
 from shapely.geometry import LineString
 from shapely.ops import unary_union
-import warnings
 import plotly.graph_objects as go
 from statistics import mean
+import dash_bootstrap_components as dbc
+import dash
+from dash import dcc
+from dash import html
+from dash.dependencies import Input, Output
+import ast
 
-def profil(point1, point2):
+family = "-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif"
+app = dash.Dash(__name__)
+app.title = "Générateur de profil topographique"
+server = app.server
+app.layout = html.Div(
+    [
+        html.Div(
+            [
+                html.Label(
+                    "Point 1 : ",
+                ),
+                dcc.Input(
+                    id="coord1",
+                    type="text",
+                    value="44.8992, 4.8165",
+                    debounce=True,
+                    style={"width": "fit-content"},
+                ),
+            ], style={"padding": "1vh", "font-family": family},
+        ),
+        html.Div(
+            [
+                html.Label(
+                    "Point 2 : ",
+                ),
+                dcc.Input(
+                    id="coord2",
+                    type="text",
+                    value="44.9029, 4.9576",
+                    debounce=True,
+                    style={"width": "fit-content"},
+                ),
+            ], style={"padding": "1vh", "font-family": family},
+        ),
+        html.Div(
+            [
+                dcc.Graph(
+                    id="our_graph",
+                    style={"height": "95vh", "position": "absolute", "width": "98%"},
+                )
+            ]
+        ),
+    ], style={"background-color": "rgba(0,0,0,0)"}
+)
+
+
+@app.callback(
+    [Output('our_graph', 'figure')],
+    [
+        Input(component_id="coord1", component_property="value"),
+        Input(component_id="coord2", component_property="value"),
+
+    ],
+)
+def profil(coord1, coord2):
     src = rasterio.open(r'C:\Users\Florian\Desktop\EOL\RASTER2.tif')
-    coord1 = point1
-    coord2 = point2
+    coord1 = ast.literal_eval(coord1)
+    coord2 = ast.literal_eval(coord2)
+    coord1 = coord1[::-1]
+    coord2 = coord2[::-1]
     line = LineString([(coord1[0], coord1[1]), (coord2[0], coord2[1])])
     geod = Geod(ellps="WGS84")
     total_length = geod.geometry_length(line)
@@ -148,8 +207,6 @@ def profil(point1, point2):
     for i in gdf["geometry"]:
         x.append(gdf["geometry"][0].distance(i))
 
-    gdf['value'] = gdf['value'].astype("string")
-    gdf["value"] = gdf["value"].str[1:-1]
     gdf['value'] = gdf['value'].astype("float")
     y = gdf["value"].to_list()
     rgb = "0, 224, 131"
@@ -225,10 +282,11 @@ def profil(point1, point2):
             ),
         ),
     )
-    fig.show()
+    return [fig]
 
 
-profil([4.81667, 44.900002], [4.96667, 44.900002])
+if __name__ == "__main__":
+    app.run_server(debug=False)
 </code></pre>
 <br>
 

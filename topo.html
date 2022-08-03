@@ -89,9 +89,9 @@
             <div class="after-post-tags">
 				<ul class="tags">
 					<li><a href="#">Python</a></li>
-					<li><a href="#">PyQGIS</a></li>
-					<li><a href="#">Plotly</a></li>
-					<li><a href="#">MNT</a></li>
+					<li><a href="#">Geopandas</a></li>
+					<li><a href="#">Rasterio</a></li>
+					<li><a href="#">Shapely</a></li>
 
 				</ul>
 			</div>
@@ -108,229 +108,127 @@
 			<!-- End Featured Image -->
 			<!-- Begin Post Content -->
 
-				<pre><code class="python">from statistics  import mean
-import plotly.graph_objects as go
+				<pre><code class="python">import geopandas as gpd
+import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+import rasterio
+from pyproj import Geod
+from rasterio.plot import show
+from shapely.geometry import LineString
+from shapely.ops import unary_union
+import warnings
+import plotly.graph_objects as go
+from statistics import mean
 
-iface.addVectorLayer("C:/Users/Florian/Desktop/département/COMMUNE.shp","","ogr")
+def profil(point1, point2):
+    src = rasterio.open(r'C:\Users\Florian\Desktop\EOL\RASTER2.tif')
+    coord1 = point1
+    coord2 = point2
+    line = LineString([(coord1[0], coord1[1]), (coord2[0], coord2[1])])
+    geod = Geod(ellps="WGS84")
+    total_length = geod.geometry_length(line)
+    distance_delta = total_length / 35000000
+    distances = np.arange(0, line.length, distance_delta)
+    points = [line.interpolate(distance) for distance in distances] + [line.boundary[1]]
+    multipoint = unary_union(points)
+    gdf2 = gpd.GeoDataFrame(index=[0], crs='EPSG:4326', geometry=[multipoint])
+    lat = [i.y for i in gdf2["geometry"][0]]
+    long = [i.x for i in gdf2["geometry"][0]]
 
-def point(nom,x,y,lien):
-    vl = QgsVectorLayer("Point", nom, "memory")
-    pr = vl.dataProvider()
-    pr.addAttributes([QgsField("nom", QVariant.String)])
-    vl.updateFields() 
-    f = QgsFeature()
-    f.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(x,y)))
-    f.setAttributes([""])
-    pr.addFeature(f)
-    vl.updateExtents() 
-    QgsProject.instance().addMapLayer(vl)
-    path = lien
-    writer = QgsVectorFileWriter.writeAsVectorFormat(vl,path,'utf-8',driverName='ESRI Shapefile')
-    QgsProject.instance().removeMapLayer(vl)
-    vl = iface.addVectorLayer(f"C:/Users/Florian/Desktop/département/{nom}.shp","","ogr")
-    feat = next(iface.activeLayer().getFeatures())
-    vl = QgsGeometry.asPoint(feat.geometry())
-    pxy1 = QgsPoint(vl)
+    df = pd.DataFrame({"Latitude": lat,
+                       "Longitude": long})
+    gdf = gpd.GeoDataFrame(
+        df, geometry=gpd.points_from_xy(df.Longitude, df.Latitude))
+    gdf.crs = "EPSG:4326"
+    coord_list = [(x, y) for x, y in zip(gdf['geometry'].x, gdf['geometry'].y)]
+    gdf['value'] = [x for x in src.sample(coord_list)]
+    gdf = gdf.to_crs(2154)
+    x = []
+    for i in gdf["geometry"]:
+        x.append(gdf["geometry"][0].distance(i))
 
-nom1 = "Point1"
-nom2= "Point2"
-coord1 = [4.3871779,45.439695]
-coord2 = [4.835659,45.764043]
+    gdf['value'] = gdf['value'].astype("string")
+    gdf["value"] = gdf["value"].str[1:-1]
+    gdf['value'] = gdf['value'].astype("float")
+    y = gdf["value"].to_list()
+    rgb = "0, 224, 131"
 
+    fig = go.Figure(
+        data=[
+            go.Scatter(
+                customdata=np.stack((gdf["Longitude"], gdf["Latitude"]), axis=1),
+                x=x,
+                y=y,
+                hovertemplate="Distance : %{x:.0f}m<br>Altitude : %{y:.0f}m<br>Lat / lon: %{customdata[1]:.3f} / %{customdata[0]:.3f}<extra></extra>",
+                fill="tozeroy",
+                line_color=f"rgb({rgb})",
+                mode="lines",
+                fillcolor=f"rgba({rgb}, 0.3)",
+                hoverinfo="none",
+            )
+        ],
+    )
+    moyenne = mean(y)
+    moyenne = round(moyenne, 1)
+    maxi = int(round(float(max(y))))
+    mini = int(round(float(min(y))))
+    pente = round(((y[-1] - y[0]) / max(x)) * 100, 1)
+    family = "-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif"
 
-point(nom1,coord1[0],coord1[1],f"C:/Users/Florian/Desktop/département/{nom1}.shp")
-point(nom2,coord2[0],coord2[1],f"C:/Users/Florian/Desktop/département/{nom2}.shp")
+    fig.update_yaxes(ticks="outside")
+    fig.update_xaxes(ticks="outside")
+    chiffre = 240
+    color = f"rgb({chiffre}, {chiffre}, {chiffre})"
+    fig.update(layout_yaxis_range=[0, maxi * 1.5])
 
-def join(num,uri):
-    processing.run("qgis:joinbylocationsummary", 
-    {'INPUT':'C:/Users/Florian/Desktop/département/Point'+num+'.shp',
-    'JOIN':'C:/Users/Florian/Desktop/département/COMMUNE.shp',
-    'PREDICATE':[0],
-    'JOIN_FIELDS':[],
-    'SUMMARIES':[],
-    'DISCARD_NONMATCHING':False,
-    'OUTPUT':uri})
-    iface.addVectorLayer(uri,"","ogr")
-    
-join("2",f"C:/Users/Florian/Desktop/département/POINTN2.shp")
-join("1",f"C:/Users/Florian/Desktop/département/POINTN1.shp")
+    fig.update_xaxes(
+        zeroline=True,
+        zerolinewidth=2,
+        zerolinecolor="#686c69",
+        showgrid=True,
+        gridwidth=0.1,
+        gridcolor=color,
+    )
+    fig.update_yaxes(
+        zeroline=True,
+        zerolinewidth=2,
+        zerolinecolor="#686c69",
+        showgrid=True,
+        gridwidth=0.1,
+        gridcolor=color,
+    )
 
-def rmvLyr(lyrname):
-    qinst = QgsProject.instance()
-    qinst.removeMapLayer(qinst.mapLayersByName(lyrname)[0].id())
-    
-for lyr in ['Point1', 'Point2']:
-    rmvLyr(lyr)
-    
-def rename(old):
-    vlayer  =QgsProject.instance().mapLayersByName(old)
-    nom = [f["NOM_COM_mi"] for f in vlayer[0].getFeatures()]
-    blockLayer = QgsProject.instance().mapLayersByName(old)[0] 
-    blockLayer.setName(nom[0])
-
-def name(n):
-    vlayer  =QgsProject.instance().mapLayersByName(n)
-    nom = [f["NOM_COM_mi"] for f in vlayer[0].getFeatures()]
-    return nom
-
-nom1 = name("POINTN1")
-nom2 = name("POINTN2")
-rename("POINTN1")
-rename("POINTN2")
-
-def line():
-    start_point = QgsPoint(coord1[0],coord1[1])
-    end_point = QgsPoint(coord2[0],coord2[1])
-    v_layer = QgsVectorLayer('LineString?crs=epsg:4326', 'line', 'memory')
-    path = (f"C:/Users/Florian/Desktop/département/Ligne.shp")
-    pr = v_layer.dataProvider()
-    seg = QgsFeature()
-    seg.setGeometry(QgsGeometry.fromPolyline([start_point, end_point]))
-    pr.addFeatures([ seg ])
-    QgsProject.instance().addMapLayers([v_layer])
-    iface.zoomToActiveLayer()
-    writer = QgsVectorFileWriter.writeAsVectorFormat(v_layer,path,'utf-8',driverName='ESRI Shapefile')
-    QgsProject.instance().removeMapLayer(v_layer)
-    line = iface.addVectorLayer(f"C:/Users/Florian/Desktop/département/Ligne.shp","","ogr")
-
-line()
-
-line = QgsVectorLayer(f"C:/Users/Florian/Desktop/département/Ligne.shp","","ogr")
-d = QgsDistanceArea()
-d.setEllipsoid('WGS84')
-
-for feat in line.getFeatures():
-    dist_point = (d.convertAreaMeasurement(d.measureLength(feat.geometry()),100))
-    
-uri = f"C:/Users/Florian/Desktop/département/Relevés.shp"
-
-processing.run("native:pointsalonglines", 
-{'INPUT':'C:/Users/Florian/Desktop/département/Ligne.shp',
-'DISTANCE':dist_point/35000000,
-'START_OFFSET':0,
-'END_OFFSET':0,
-'OUTPUT':uri})
-
-iface.addVectorLayer(uri,"","ogr")
-iface.addRasterLayer("C:/Users/Florian/Downloads/EUDEM/eu_dem_v11_E30N20.TIF","Raster","gdal")
-
-uri = f"C:/Users/Florian/Desktop/département/raster.shp"
-
-processing.run("native:rastersampling", 
-{'INPUT':'C:/Users/Florian/Desktop/département/Relevés.shp',
-'RASTERCOPY':'C:/Users/Florian/Downloads/EUDEM/eu_dem_v11_E30N20.TIF',
-'COLUMN_PREFIX':'SAMPLE_',
-'OUTPUT':uri})
-iface.addVectorLayer(uri,"","ogr")
-
-uri = f"C:/Users/Florian/Desktop/département/matrice.shp"
-
-processing.run("qgis:distancematrix",
-{'INPUT':'C:/Users/Florian/Desktop/département/raster.shp',
-'INPUT_FIELD':'FID',
-'TARGET':'C:/Users/Florian/Desktop/département/raster.shp',
-'TARGET_FIELD':'FID',
-'MATRIX_TYPE':1,
-'NEAREST_POINTS':0,
-'OUTPUT':uri})
-iface.addVectorLayer(uri,"","ogr")
-
-matrice  =QgsProject.instance().mapLayersByName("matrice")
-x = [f["0"] for f in matrice[0].getFeatures()]
-haut  =QgsProject.instance().mapLayersByName("raster")
-y = [f["SAMPLE_1"] for f in haut[0].getFeatures()]
-x = [ '%.0f' % i for i in x ]
-y = [ '%.1f' % i for i in y ]
-
-layer = QgsVectorLayer(uri,"points","ogr")
-X1 = []
-Y1 = []
-
-for i in layer.getFeatures():
-    geom = i.geometry()
-    X1.append(geom.asPoint().x())
-    Y1.append(geom.asPoint().y())
-
-X1 = [round(x, 3) for x in X1]
-Y1 = [round(x, 3) for x in Y1]
-x = [int(i) for i in x]
-y = [float(i) for i in y]
-
-fig = go.Figure(
-    data=[
-        go.Scatter(
-            customdata=np.stack((X1, Y1), axis=1),
-            x=x,
-            y=y,
-            hovertemplate="Distance : %{x:.0f}m<br>Altitude : %{y:.0f}m<br>Lat / lon: %{customdata[0]:.3f} / %{customdata[1]:.3f}<extra></extra>",
-            fill="tozeroy",
-            line_color="rgba(1,224,130,255)",
-            mode="lines",
-            fillcolor="rgba(1,224,130,0.35)",
-            hoverinfo="none",
-        )
-    ],
-)
-
-family = "-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif"
-moyenne = mean(y)
-moyenne = round(moyenne, 1)
-maxi = int(round(float(max(y))))
-mini = int(round(float(min(y))))
-pente = round(((y[-1] - y[0]) / max(x)) * 100, 1)
-
-fig.update_yaxes(ticks="outside")
-fig.update_xaxes(ticks="outside")
-chiffre = 240
-color = f"rgb({chiffre}, {chiffre}, {chiffre})"
-fig.update(layout_yaxis_range=[0, maxi * 1.5])
-
-fig.update_xaxes(
-    zeroline=True,
-    zerolinewidth=2,
-    zerolinecolor="#686c69",
-    showgrid=True,
-    gridwidth=0.1,
-    gridcolor=color,
-)
-fig.update_yaxes(
-    zeroline=True,
-    zerolinewidth=2,
-    zerolinecolor="#686c69",
-    showgrid=True,
-    gridwidth=0.1,
-    gridcolor=color,
-)
-
-fig.update_yaxes(title_text="Altitude")
-fig.layout.xaxis.fixedrange = True
-fig.layout.yaxis.fixedrange = True
-fig.update_layout(
-    {
-        "plot_bgcolor": "rgba(255,255,255,0)",
-        "paper_bgcolor": "rgba(255,255,255,0)",
-    },
-    legend_itemdoubleclick=False,
-    margin={"r": 0, "l": 0},
-    xaxis_title=f"Distance<br><i>Longueur : {max(x)}m / Dénivelé : {round(y[-1] -y[0],1)}m / Moyenne : {moyenne}m / Pente : {pente}%</i>",
-    font=dict(size=11, family=family),
-    title_text=f"<i>Profil topographique, {nom1[0]} - {nom2[0]}<br>Départ : {coord1[0]} / {coord1[1]} - Arrivée : {coord2[0]} / {coord2[1]} </i>",
-    title_x=0,
-    title_y=0.9,
-    hovermode="x",
-    legend=dict(title=None),
-    hoverlabel=dict(
-        bgcolor="rgba(255,255,255,0.8)",
-        font=dict(
-            color="black",
-            family="-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif",
-            size=11,
+    fig.update_yaxes(title_text="Altitude")
+    fig.layout.xaxis.fixedrange = True
+    fig.layout.yaxis.fixedrange = True
+    fig.update_layout(
+        {
+            "plot_bgcolor": "rgba(255,255,255,0)",
+            "paper_bgcolor": "rgba(255,255,255,0)",
+        },
+        legend_itemdoubleclick=False,
+        margin={"r": 0, "l": 0},
+        xaxis_title=f"Distance<br><i>Longueur : {int(max(x))}m / Dénivelé : {round(y[-1] - y[0], 1)}m / Moyenne : {moyenne}m / Pente : {pente}%</i>",
+        font=dict(size=11, family=family),
+        title_text=f"<i>Profil topographique,<br>Départ : {coord1[1]} / {coord1[0]} - Arrivée : {coord2[1]} / {coord2[0]} </i>",
+        title_x=0,
+        title_y=0.9,
+        hovermode="x",
+        legend=dict(title=None),
+        hoverlabel=dict(
+            bgcolor="rgba(255,255,255,0.8)",
+            font=dict(
+                color="black",
+                family="-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Arial,sans-serif",
+                size=11,
+            ),
         ),
-    ),
-)
+    )
+    fig.show()
 
-fig.write_html(f"C:/Users/Florian/Desktop/AASITE/public_html/profil.html",config={"displayModeBar": False},)
+
+profil([4.81667, 44.900002], [4.96667, 44.900002])
 </code></pre>
 <br>
 
